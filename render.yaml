@@ -2,6 +2,7 @@ services:
   # Backend API Service
   - type: web
     name: mlx-direct-api
+    plan: free
     runtime: node
     rootDir: backend
     buildCommand: npm install
