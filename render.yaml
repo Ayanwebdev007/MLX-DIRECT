@@ -13,7 +13,7 @@ services:
         value: production
 
   # Frontend Static Site
-  - type: static
+  - type: static_site
     name: mlx-direct-web
     rootDir: frontend
     buildCommand: npm install && npm run build
