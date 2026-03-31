@@ -33,7 +33,7 @@ const Services = () => {
       title: "Technical Radiography",
       subtitle: "NDT & Flaw Detection",
       icon: <FaRadiation />,
-      image: "/service-ndt.png",
+      image: "/service-radiography.png",
       desc: "Comprehensive Non-Destructive Testing (NDT) and industrial radiography services designed to identify internal structural defects without compromising material integrity."
     },
     {
