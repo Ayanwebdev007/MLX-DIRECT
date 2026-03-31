@@ -1,0 +1,58 @@
+.navbar {
+  background-color: var(--white);
+  padding: 15px 0;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.logo img {
+  height: 60px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 25px;
+}
+
+.nav-links a {
+  font-weight: 500;
+  color: var(--text-gray);
+  transition: color 0.3s;
+}
+
+.nav-links a:hover, .nav-links a.active {
+  color: var(--primary-gold);
+}
+
+.btn-quote {
+  background-color: var(--primary-gold);
+  color: var(--white);
+  border: none;
+  padding: 12px 25px;
+  border-radius: 30px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.25s, background-color 0.3s;
+}
+
+.btn-quote:hover {
+  background-color: #c49a2d;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 992px) {
+  .nav-links {
+    display: none; /* Hide on mobile for now, can add hamburger later */
+  }
+}
