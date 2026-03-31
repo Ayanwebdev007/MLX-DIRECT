@@ -13,13 +13,11 @@ services:
         value: production
 
   # Frontend Static Site
-  - type: web
+  - type: static_site
     name: mlx-direct-web
-    runtime: node
-    static: true
     rootDir: frontend
     buildCommand: npm install && npm run build
-    staticPublishPath: dist
+    publishPath: dist
     envVars:
       - key: VITE_API_URL
         fromService:
