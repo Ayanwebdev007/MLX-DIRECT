@@ -22,14 +22,18 @@ const Portfolio = () => {
   }, []);
 
   const projects = [
-    { id: "MLX-P01", title: "STRUCTURAL SITE AUDIT", cat: "INDUSTRIAL RADIOGRAPHY", img: "/port-site.png" },
-    { id: "MLX-P02", title: "PRECISION RESTORATION", cat: "HERITAGE PRESERVATION", img: "/port-watch.png" },
-    { id: "MLX-P03", title: "INFRASTRUCTURE SCALE", cat: "LAND DEVELOPMENT", img: "/port-hero.png" },
-    { id: "MLX-P04", title: "LEGACY ANTIQUITY", cat: "HERITAGE", img: "/port-coin.png" },
-    { id: "MLX-P05", title: "TECHNICAL SYNERGY", cat: "TEAM", img: "/port-team.png" },
-    { id: "MLX-P06", title: "PRECISION METRICS", cat: "INSTRUMENTATION", img: "/port-precision.png" },
-    { id: "MLX-P07", title: "ELITE VISION", cat: "AERIAL", img: "/port-vision.png" },
-    { id: "MLX-P08", title: "STRATEGIC SCALE", cat: "HEAVY EQUIPMENT", img: "/port-new-8.png" }
+    { id: "MLX-P01", title: "STRUCTURAL SITE AUDIT", cat: "INDUSTRIAL RADIOGRAPHY", img: "/portfolio/MLX 1.webp" },
+    { id: "MLX-P02", title: "ENGINEERING SYNERGY", cat: "TECHNICAL TEAM", img: "/port-team.png" }, // Human
+    { id: "MLX-P03", title: "INFRASTRUCTURE SCALE", cat: "LAND DEVELOPMENT", img: "/portfolio/MLX 11.webp" },
+    { id: "MLX-P04", title: "SITE PLANNING", cat: "INDUSTRIAL DESIGN", img: "/port-site.png" }, // Unique Human (Replaced duplicate)
+    { id: "MLX-P05", title: "ADVANCED RADIOGRAPHY", cat: "SAFETY AUDIT", img: "/portfolio/MLX 13.webp" },
+    { id: "MLX-P06", title: "PROCESS OPTIMIZATION", cat: "INDUSTRIAL OPERATIONS", img: "/about-industrial.png" }, // Human
+    { id: "MLX-P07", title: "INDUSTRIAL TRADING", cat: "GLOBAL LOGISTICS", img: "/portfolio/MLX 15.webp" },
+    { id: "MLX-P08", title: "OPERATIONAL INTELLIGENCE", cat: "MANAGEMENT", img: "/port-vision.png" }, // Human
+    { id: "MLX-P09", title: "ELITE OPERATIONS", cat: "STRATEGIC PLANNING", img: "/portfolio/MLX 28.webp" },
+    { id: "MLX-P10", title: "ASSET INTEGRITY", cat: "INSPECTION", img: "/portfolio/MLX 30.webp" },
+    { id: "MLX-P11", title: "PROJECT SYNERGY", cat: "TECHNICAL DESIGN", img: "/portfolio/MLX 6.webp" },
+    { id: "MLX-P12", title: "PRECISION TRADING", cat: "SUPPLY CHAIN", img: "/portfolio/MLX 7.webp" }
   ];
 
   return (

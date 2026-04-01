@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { FaFacebookF, FaTwitter, FaInstagram, FaYoutube, FaPhoneAlt, FaEnvelope, FaMapMarkerAlt } from 'react-icons/fa';
 
 const Footer = () => {
@@ -45,14 +46,13 @@ const Footer = () => {
               <div className="absolute -bottom-2 left-0 w-12 h-[2px] bg-primary-green"></div>
             </h3>
             <ul className="space-y-4">
-              {['Home', 'Consultancy', 'Land Development', 'About Us', 'Services', 'Contact Us'].map((link) => (
-                <li key={link}>
-                  <a href="#" className="text-gray-400 hover:text-primary-green text-sm font-medium transition-colors duration-300 flex items-center gap-2 group">
-                    <div className="w-0 h-[1px] bg-primary-green group-hover:w-4 transition-all duration-300"></div>
-                    {link}
-                  </a>
-                </li>
-              ))}
+              <li><Link to="/" className="text-gray-400 hover:text-primary-green text-sm font-medium transition-colors duration-300 flex items-center gap-2 group"><div className="w-0 h-[1px] bg-primary-green group-hover:w-4 transition-all duration-300"></div>Home</Link></li>
+              <li><Link to="/about" className="text-gray-400 hover:text-primary-green text-sm font-medium transition-colors duration-300 flex items-center gap-2 group"><div className="w-0 h-[1px] bg-primary-green group-hover:w-4 transition-all duration-300"></div>About Us</Link></li>
+              <li><Link to="/art-and-craft" className="text-gray-400 hover:text-primary-green text-sm font-medium transition-colors duration-300 flex items-center gap-2 group"><div className="w-0 h-[1px] bg-primary-green group-hover:w-4 transition-all duration-300"></div>Art & Craft</Link></li>
+              <li><Link to="/constructions" className="text-gray-400 hover:text-primary-green text-sm font-medium transition-colors duration-300 flex items-center gap-2 group"><div className="w-0 h-[1px] bg-primary-green group-hover:w-4 transition-all duration-300"></div>Constructions</Link></li>
+              <li><a href="#" className="text-gray-400 hover:text-primary-green text-sm font-medium transition-colors duration-300 flex items-center gap-2 group"><div className="w-0 h-[1px] bg-primary-green group-hover:w-4 transition-all duration-300"></div>Services</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-primary-green text-sm font-medium transition-colors duration-300 flex items-center gap-2 group"><div className="w-0 h-[1px] bg-primary-green group-hover:w-4 transition-all duration-300"></div>Consultancy</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-primary-green text-sm font-medium transition-colors duration-300 flex items-center gap-2 group"><div className="w-0 h-[1px] bg-primary-green group-hover:w-4 transition-all duration-300"></div>Contact Us</a></li>
             </ul>
           </div>
 

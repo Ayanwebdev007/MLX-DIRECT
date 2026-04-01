@@ -55,7 +55,7 @@ const Hero = () => {
 
           {/* Refined Description */}
           <p className="text-base md:text-lg text-gray-400 leading-relaxed max-w-sm font-light">
-            Trading, Industrial Radiography & Consulting across Canada.
+            Trading, Industrial Radiography & Consulting across the USA.
           </p>
 
           {/* Premium Interaction Point */}

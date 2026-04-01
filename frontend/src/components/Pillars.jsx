@@ -99,7 +99,7 @@ const Pillars = () => {
 
           {/* Cell 4: Strategic Value (1/3 Width) */}
           <div className={`lg:col-span-1 row-span-1 relative group overflow-hidden transition-all duration-1000 delay-700 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
-             <img src="/about-precision.png" alt="Strategic Value" className="w-full h-full object-cover transition-all duration-1000 grayscale brightness-50 group-hover:grayscale-0 group-hover:brightness-100" />
+             <img src="/portfolio/MLX 2.webp" alt="Strategic Value" className="w-full h-full object-cover transition-all duration-1000 grayscale brightness-50 group-hover:grayscale-0 group-hover:brightness-100" />
              <div className="absolute inset-0 bg-primary-green/10 group-hover:bg-transparent transition-all duration-700"></div>
              <div className="absolute inset-0 p-10 flex flex-col justify-end">
                 <div className="flex items-center gap-3 mb-3">

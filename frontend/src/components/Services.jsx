@@ -46,7 +46,7 @@ const Services = () => {
   ];
 
   return (
-    <section ref={sectionRef} className="pt-24 lg:pt-32 pb-6 lg:pb-8 bg-white relative overflow-hidden">
+    <section ref={sectionRef} className="pt-12 lg:pt-16 pb-6 lg:pb-8 bg-white relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         
         {/* Section Header */}

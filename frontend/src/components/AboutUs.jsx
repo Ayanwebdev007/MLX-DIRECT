@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { FaShieldAlt, FaGlobe, FaCogs, FaProjectDiagram } from 'react-icons/fa';
 
 const AboutUs = () => {
@@ -80,7 +81,7 @@ const AboutUs = () => {
             </div>
             {/* Coordinate Label */}
             <div className="absolute top-6 right-6 text-[8px] font-mono text-white/40 tracking-[0.4em] pointer-events-none">
-              [ 43.12N / 79.38W ]
+              [ 26.12N / 80.14W ]
             </div>
           </div>
 
@@ -88,9 +89,9 @@ const AboutUs = () => {
           <div className={`lg:col-span-1 row-span-2 bg-gray-900 p-12 flex flex-col justify-between shadow-2xl transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-20'}`}>
              <div className="space-y-12">
                 <div className="group cursor-default">
-                  <div className="text-primary-green text-xs font-black tracking-widest uppercase mb-2">History</div>
-                  <div className="text-5xl font-black text-white">25<span className="text-primary-green">+</span></div>
-                  <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">Established Years</div>
+                   <div className="text-primary-green text-xs font-black tracking-widest uppercase mb-2">History</div>
+                   <div className="text-5xl font-black text-white">25<span className="text-primary-green">+</span></div>
+                   <div className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">Established Years</div>
                 </div>
                 <div className="group cursor-default">
                    <div className="text-primary-green text-xs font-black tracking-widest uppercase mb-2">Network</div>
@@ -128,24 +129,18 @@ const AboutUs = () => {
 
           {/* Cell 4: Engineering Precision (1/3 Width - but made 2/3 below mobile) */}
           <div className={`lg:col-span-1 row-span-1 relative rounded-sm overflow-hidden shadow-xl transition-all duration-1000 delay-700 group ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'}`}>
-             <img src="/about-precision.png" alt="Precision Detail" className="w-full h-full object-cover brightness-75 group-hover:brightness-100 group-hover:scale-110 transition-all duration-1000" />
+             <img src="/portfolio/MLX 3.webp" alt="Precision Detail" className="w-full h-full object-cover brightness-75 group-hover:brightness-100 group-hover:scale-110 transition-all duration-1000" />
              <div className="absolute inset-0 bg-primary-green/10 mix-blend-overlay"></div>
-             <div className="absolute inset-0 flex items-center justify-center">
-                <div className="bg-white/90 backdrop-blur-md p-6 border border-white/50 shadow-2xl">
-                   <div className="text-[9px] font-black uppercase tracking-[0.4em] text-gray-400 mb-1">Precision Seal</div>
-                   <div className="text-xs font-black uppercase tracking-widest text-primary-green">MLX Direct Auth.</div>
-                </div>
-             </div>
           </div>
 
         </div>
 
         {/* Final Integrated Action */}
         <div className={`mt-12 flex flex-col items-center justify-center transition-all duration-1000 delay-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
-           <button className="relative px-12 py-5 bg-gray-900 overflow-hidden group">
+           <Link to="/about" className="relative px-12 py-5 bg-gray-900 overflow-hidden group">
               <span className="relative z-10 text-white text-xs font-black uppercase tracking-[0.5em] group-hover:text-white transition-colors duration-500">Discover Our Process</span>
               <div className="absolute inset-0 bg-primary-green scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left ease-out"></div>
-           </button>
+           </Link>
            <p className="mt-6 text-[10px] text-gray-400 font-bold uppercase tracking-[0.3em]">Operational Since 1999 • All Rights Reserved</p>
         </div>
 
