@@ -5,6 +5,8 @@ import Home from './pages/Home';
 import AboutPage from './pages/AboutPage';
 import ArtCraftPage from './pages/ArtCraftPage';
 import ConstructionPage from './pages/ConstructionPage';
+import LandDevelopmentPage from './pages/LandDevelopmentPage';
+import ContactPage from './pages/ContactPage';
 import './App.css';
 
 function App() {
@@ -16,6 +18,8 @@ function App() {
           <Route path="about" element={<AboutPage />} />
           <Route path="art-and-craft" element={<ArtCraftPage />} />
           <Route path="constructions" element={<ConstructionPage />} />
+          <Route path="land-development" element={<LandDevelopmentPage />} />
+          <Route path="contact" element={<ContactPage />} />
           {/* Add more routes here as needed */}
         </Route>
       </Routes>

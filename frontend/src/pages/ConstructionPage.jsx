@@ -10,12 +10,12 @@ const ConstructionPage = () => {
   }, []);
 
   const developments = [
-    { title: "Family House Developments", img: "/constructions/dev-family.png" },
-    { title: "Commercial Building Developments", img: "/constructions/dev-commercial.png" },
-    { title: "Sports Center Developments", img: "/constructions/dev-sports.png" },
-    { title: "Office & Tower Developments", img: "/constructions/dev-office.png" },
-    { title: "Public Facility Developments", img: "/constructions/dev-public.png" },
-    { title: "Art Center Developments", img: "/constructions/dev-art.png" }
+    { title: "Family House Developments", img: "/dev-family.png" },
+    { title: "Commercial Building Developments", img: "/dev-commercial.png" },
+    { title: "Sports Center Developments", img: "/dev-sports.png" },
+    { title: "Office & Tower Developments", img: "/dev-office.png" },
+    { title: "Public Facility Developments", img: "/dev-public.png" },
+    { title: "Art Center Developments", img: "/dev-art.png" }
   ];
 
   return (
@@ -25,7 +25,7 @@ const ConstructionPage = () => {
       <section className="relative h-[80vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
            <img 
-             src="/constructions/hero.png" 
+             src="/hero.png" 
              alt="Construction Excellence" 
              className="w-full h-full object-cover brightness-50"
            />
@@ -139,7 +139,7 @@ const ConstructionPage = () => {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
              <div className="relative h-[700px] overflow-hidden shadow-2xl">
-                <img src="/constructions/dev-office.png" alt="Expertise" className="w-full h-full object-cover" />
+                <img src="/dev-office.png" alt="Expertise" className="w-full h-full object-cover" />
                 <div className="absolute top-10 left-10 bg-primary-green p-10 shadow-2xl">
                    <div className="text-white text-5xl font-black italic">32<span className="text-sm font-normal not-italic ml-2">YRS</span></div>
                    <div className="text-[10px] text-white/70 font-black uppercase tracking-widest mt-2">Expert Experience</div>

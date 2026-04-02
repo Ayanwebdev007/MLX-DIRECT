@@ -52,7 +52,7 @@ const Footer = () => {
               <li><Link to="/constructions" className="text-gray-400 hover:text-primary-green text-sm font-medium transition-colors duration-300 flex items-center gap-2 group"><div className="w-0 h-[1px] bg-primary-green group-hover:w-4 transition-all duration-300"></div>Constructions</Link></li>
               <li><a href="#" className="text-gray-400 hover:text-primary-green text-sm font-medium transition-colors duration-300 flex items-center gap-2 group"><div className="w-0 h-[1px] bg-primary-green group-hover:w-4 transition-all duration-300"></div>Services</a></li>
               <li><a href="#" className="text-gray-400 hover:text-primary-green text-sm font-medium transition-colors duration-300 flex items-center gap-2 group"><div className="w-0 h-[1px] bg-primary-green group-hover:w-4 transition-all duration-300"></div>Consultancy</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-primary-green text-sm font-medium transition-colors duration-300 flex items-center gap-2 group"><div className="w-0 h-[1px] bg-primary-green group-hover:w-4 transition-all duration-300"></div>Contact Us</a></li>
+              <li><Link to="/contact" className="text-gray-400 hover:text-primary-green text-sm font-medium transition-colors duration-300 flex items-center gap-2 group"><div className="w-0 h-[1px] bg-primary-green group-hover:w-4 transition-all duration-300"></div>Contact Us</Link></li>
             </ul>
           </div>
 

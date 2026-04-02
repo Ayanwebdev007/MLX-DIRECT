@@ -13,8 +13,8 @@ const Navbar = () => {
           <li><Link to="/about" className="hover:text-primary-green transition-colors">About Us</Link></li>
           <li><Link to="/art-and-craft" className="hover:text-primary-green transition-colors">Art & Craft</Link></li>
           <li><Link to="/constructions" className="hover:text-primary-green transition-colors">Constructions</Link></li>
-          <li><a href="#" className="hover:text-primary-green transition-colors">Land Development</a></li>
-          <li><a href="#" className="hover:text-primary-green transition-colors">Contact Us</a></li>
+          <li><Link to="/land-development" className="hover:text-primary-green transition-colors">Land Development</Link></li>
+          <li><Link to="/contact" className="hover:text-primary-green transition-colors">Contact Us</Link></li>
         </ul>
         <div className="flex-shrink-0">
           <button className="bg-primary-green text-white px-6 py-3 rounded-full font-bold hover:bg-green-700 transition-all transform hover:-translate-y-0.5">
