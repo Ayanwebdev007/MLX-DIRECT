@@ -22,18 +22,18 @@ const Portfolio = () => {
   }, []);
 
   const projects = [
-    { id: "MLX-P01", title: "STRUCTURAL SITE AUDIT", cat: "INDUSTRIAL RADIOGRAPHY", img: "/portfolio/MLX 1.webp" },
-    { id: "MLX-P02", title: "ENGINEERING SYNERGY", cat: "TECHNICAL TEAM", img: "/port-team.png" }, // Human
-    { id: "MLX-P03", title: "INFRASTRUCTURE SCALE", cat: "LAND DEVELOPMENT", img: "/portfolio/MLX 11.webp" },
-    { id: "MLX-P04", title: "SITE PLANNING", cat: "INDUSTRIAL DESIGN", img: "/port-site.png" }, // Unique Human (Replaced duplicate)
-    { id: "MLX-P05", title: "ADVANCED RADIOGRAPHY", cat: "SAFETY AUDIT", img: "/portfolio/MLX 13.webp" },
-    { id: "MLX-P06", title: "PROCESS OPTIMIZATION", cat: "INDUSTRIAL OPERATIONS", img: "/about-industrial.png" }, // Human
-    { id: "MLX-P07", title: "INDUSTRIAL TRADING", cat: "GLOBAL LOGISTICS", img: "/portfolio/MLX 15.webp" },
-    { id: "MLX-P08", title: "OPERATIONAL INTELLIGENCE", cat: "MANAGEMENT", img: "/port-vision.png" }, // Human
-    { id: "MLX-P09", title: "ELITE OPERATIONS", cat: "STRATEGIC PLANNING", img: "/portfolio/MLX 28.webp" },
-    { id: "MLX-P10", title: "ASSET INTEGRITY", cat: "INSPECTION", img: "/portfolio/MLX 30.webp" },
-    { id: "MLX-P11", title: "PROJECT SYNERGY", cat: "TECHNICAL DESIGN", img: "/portfolio/MLX 6.webp" },
-    { id: "MLX-P12", title: "PRECISION TRADING", cat: "SUPPLY CHAIN", img: "/portfolio/MLX 7.webp" }
+    { id: "BOA-P01", title: "STRUCTURAL SITE AUDIT", cat: "INDUSTRIAL RADIOGRAPHY", img: "/portfolio/MLX 1.webp" },
+    { id: "BOA-P02", title: "ENGINEERING SYNERGY", cat: "TECHNICAL TEAM", img: "/port-team.png" }, // Human
+    { id: "BOA-P03", title: "INFRASTRUCTURE SCALE", cat: "LAND DEVELOPMENT", img: "/portfolio/MLX 11.webp" },
+    { id: "BOA-P04", title: "SITE PLANNING", cat: "INDUSTRIAL DESIGN", img: "/port-site.png" }, // Unique Human (Replaced duplicate)
+    { id: "BOA-P05", title: "ADVANCED RADIOGRAPHY", cat: "SAFETY AUDIT", img: "/portfolio/MLX 13.webp" },
+    { id: "BOA-P06", title: "PROCESS OPTIMIZATION", cat: "INDUSTRIAL OPERATIONS", img: "/about-industrial.png" }, // Human
+    { id: "BOA-P07", title: "INDUSTRIAL TRADING", cat: "GLOBAL LOGISTICS", img: "/portfolio/MLX 15.webp" },
+    { id: "BOA-P08", title: "OPERATIONAL INTELLIGENCE", cat: "MANAGEMENT", img: "/port-vision.png" }, // Human
+    { id: "BOA-P09", title: "ELITE OPERATIONS", cat: "STRATEGIC PLANNING", img: "/portfolio/MLX 28.webp" },
+    { id: "BOA-P10", title: "ASSET INTEGRITY", cat: "INSPECTION", img: "/portfolio/MLX 30.webp" },
+    { id: "BOA-P11", title: "PROJECT SYNERGY", cat: "TECHNICAL DESIGN", img: "/portfolio/MLX 6.webp" },
+    { id: "BOA-P12", title: "PRECISION TRADING", cat: "SUPPLY CHAIN", img: "/portfolio/MLX 7.webp" }
   ];
 
   return (

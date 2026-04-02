@@ -12,6 +12,22 @@ services:
         value: 5000
       - key: NODE_ENV
         value: production
+      - key: MONGODB_URI
+        sync: false # Set this manually in Render Dashboard for security
+      - key: JWT_SECRET
+        sync: false # Set this manually in Render Dashboard for security
+      - key: FRONTEND_URL
+        value: https://mlxdirect.com
+      - key: ADMIN_URL
+        value: https://mlxdirect.com
+      - key: MOBILE_WEB_URL
+        value: https://mlxdirect.com
+      - key: FIREBASE_CONFIG_JSON
+        sync: false # Copy the content of your firebase-admin-sdk.json into this variable in Render
+      - key: ADMIN_EMAIL
+        value: admin@mlxdirect.com
+      - key: ADMIN_PASSWORD
+        value: admin123
 
   # Frontend Static Site
   - type: web
@@ -21,8 +37,5 @@ services:
     buildCommand: npm install && npm run build
     staticPublishPath: dist
     envVars:
-      - key: VITE_API_URL
-        fromService:
-          type: web
-          name: mlx-direct-api
-          property: host
+      - key: VITE_API_BASE_URL
+        value: https://mlxdirect.com/api

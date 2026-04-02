@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "654537241880",
+    "project_id": "boa-platform",
+    "storage_bucket": "boa-platform.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:654537241880:android:26f552f24525951bd01a6d",
+        "android_client_info": {
+          "package_name": "com.example.flutter_user_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAanFDmKoOBDSFQSP6p0yv3Z6VmSRSqaU4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

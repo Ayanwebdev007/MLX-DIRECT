@@ -1,27 +1,55 @@
 const express = require('express');
 const cors = require('cors');
+const mongoose = require('mongoose');
 require('dotenv').config();
+
+const authRoutes = require('./routes/authRoutes');
+const walletRoutes = require('./routes/walletRoutes');
+const { seedAdmin } = require('./controllers/authController');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+// Middleware
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:5175',
+  'https://mlxdirect.com',
+  process.env.FRONTEND_URL,
+  process.env.ADMIN_URL,
+  process.env.MOBILE_WEB_URL
+].filter(Boolean);
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 app.use(express.json());
+app.use('/uploads', express.static('uploads'));
+
+// MongoDB Connection
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => {
+    console.log('Connected to MongoDB');
+    seedAdmin(); // Seed admin user if it doesn't exist
+  })
+  .catch(err => console.error('MongoDB connection error:', err));
+
+// Routes
+app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/wallet', require('./routes/walletRoutes'));
+app.use('/api/banners', require('./routes/bannerRoutes'));
+app.use('/api/notifications', require('./routes/notificationRoutes'));
 
 app.get('/', (req, res) => {
-  res.send('Backend is running. Use /api/test for the test endpoint.');
-});
-
-app.get('/api/test', (req, res) => {
-  res.json({ message: 'Hello from the backend!' });
-});
-
-app.post('/api/contact', (req, res) => {
-  const { name, email, subject, message } = req.body;
-  console.log(`New Contact Form Submission:`, { name, email, subject, message });
-  
-  // In a real production scenario, you would send an email here using Nodemailer
-  res.status(200).json({ message: 'Success' });
+  res.send('BOA Backend is running.');
 });
 
 app.listen(PORT, () => {

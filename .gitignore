@@ -14,3 +14,8 @@ build/
 # OS Specific
 .DS_Store
 Thumbs.db
+
+# Firebase Secrets
+*_firebase-adminsdk-*.json
+google-services.json
+

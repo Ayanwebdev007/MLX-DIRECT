@@ -16,7 +16,7 @@ const Footer = () => {
               <div className="absolute -bottom-2 left-0 w-12 h-[2px] bg-primary-green"></div>
             </h3>
             <p className="text-gray-400 text-sm font-light leading-relaxed mb-10">
-              Since our first day in business, MLX DIRECT has been offering our customers the best safety in the domain of radiology. Mlx Direct conveys both knowledge and information for understanding technologies, that includes in the house designs for solid waste mangement. Mlx Direct is just not the name, its a brand in the world of radiation safety services. We are the "one source" global technology enabled service provider in the ground of certification, testing measurements, inspection and verification.
+              Since our first day in business, BOA has been offering our customers the best safety in the domain of radiology. BOA conveys both knowledge and information for understanding technologies, that includes in the house designs for solid waste mangement. BOA is just not the name, its a brand in the world of radiation safety services. We are the "one source" global technology enabled service provider in the ground of certification, testing measurements, inspection and verification.
             </p>
             
             {/* Social Suite */}
@@ -89,7 +89,7 @@ const Footer = () => {
               </li>
               <li className="flex items-start gap-4">
                 <FaEnvelope className="text-primary-green mt-1" />
-                <span className="text-sm font-medium text-gray-400 hover:text-primary-green cursor-pointer transition-colors tracking-tight">admin@mlxdirect.com</span>
+                <span className="text-sm font-medium text-gray-400 hover:text-primary-green cursor-pointer transition-colors tracking-tight">admin@boa.com</span>
               </li>
               <li className="flex items-start gap-4">
                 <FaMapMarkerAlt className="text-primary-green mt-1 text-lg" />
@@ -108,7 +108,7 @@ const Footer = () => {
         {/* Global Bottom Bar */}
         <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
           <p className="text-[10px] font-medium text-gray-600 uppercase tracking-[0.2em]">
-            © 2026 <span className="text-white font-black">MLX DIRECT</span>. ALL RIGHTS RESERVED.
+            © 2026 <span className="text-white font-black">BOA</span>. ALL RIGHTS RESERVED.
           </p>
           <div className="flex gap-8 text-[10px] font-black text-gray-600 uppercase tracking-widest">
             <a href="#" className="hover:text-primary-green transition-colors">Privacy Policy</a>

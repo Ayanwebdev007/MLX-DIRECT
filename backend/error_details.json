@@ -1,0 +1,4 @@
+{
+  "message": "next is not a function",
+  "stack": "TypeError: next is not a function\n    at model.<anonymous> (C:\\Users\\girid\\Downloads\\MLXDIRECT\\backend\\models\\User.js:37:3)\n    at async Kareem.execPre (C:\\Users\\girid\\Downloads\\MLXDIRECT\\backend\\node_modules\\kareem\\index.js:70:24)\n    at async model.$__save (C:\\Users\\girid\\Downloads\\MLXDIRECT\\backend\\node_modules\\mongoose\\lib\\model.js:394:5)\n    at async model.save (C:\\Users\\girid\\Downloads\\MLXDIRECT\\backend\\node_modules\\mongoose\\lib\\model.js:664:5)\n    at async test (C:\\Users\\girid\\Downloads\\MLXDIRECT\\backend\\test-db.js:25:7)"
+}
