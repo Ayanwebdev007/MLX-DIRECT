@@ -41,7 +41,7 @@ services:
         from: /api/*
         destination: https://mlx-direct-api.onrender.com/api/*
       - type: rewrite
-        from: /(.*)
+        from: /*
         to: /index.html
     envVars:
       - key: VITE_API_BASE_URL
