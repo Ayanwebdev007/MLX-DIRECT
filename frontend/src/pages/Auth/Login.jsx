@@ -14,8 +14,12 @@ const Login = () => {
     e.preventDefault();
     try {
       const response = await api.post('/auth/login', { email, password });
-      login(response.data.token, response.data.user);
-      navigate(response.data.user.role === 'admin' ? '/admin' : '/dashboard');
+      if (response.data && response.data.user) {
+        login(response.data.token, response.data.user);
+        navigate(response.data.user.role === 'admin' ? '/admin' : '/dashboard');
+      } else {
+        setError('Login succeeded but user data is missing. Please try again.');
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
     }
