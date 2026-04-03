@@ -45,4 +45,4 @@ services:
         to: /index.html
     envVars:
       - key: VITE_API_BASE_URL
-        value: /api
+        value: https://mlx-direct-api.onrender.com/api
