@@ -81,7 +81,7 @@ class HistoryScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              DateFormat('EEE, MMM dd • hh:mm a').format(tx.createdAt),
+                              DateFormat('EEE, MMM dd • hh:mm a').format(tx.createdAt.toLocal()),
                               style: TextStyle(color: Colors.grey.shade400, fontSize: 11, fontWeight: FontWeight.w600),
                             ),
                           ],

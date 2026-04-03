@@ -92,6 +92,8 @@ class LoginWrapper extends StatefulWidget {
 }
 
 class _LoginWrapperState extends State<LoginWrapper> {
+  bool _isChecking = true;
+
   @override
   void initState() {
     super.initState();
@@ -101,13 +103,41 @@ class _LoginWrapperState extends State<LoginWrapper> {
         final user = Provider.of<WalletProvider>(context, listen: false).user;
         if (user != null) {
           Navigator.pushReplacementNamed(context, '/dashboard');
+        } else {
+          setState(() => _isChecking = false);
         }
+      }).catchError((_) {
+        if (mounted) setState(() => _isChecking = false);
       });
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isChecking) {
+      return Scaffold(
+        backgroundColor: const Color(0xFF6B21A8),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 80, height: 80,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: const Icon(Icons.account_balance_wallet_rounded, color: Colors.white, size: 40),
+              ),
+              const SizedBox(height: 24),
+              const Text('BOA PAY', style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w900, letterSpacing: -1)),
+              const SizedBox(height: 32),
+              const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5)),
+            ],
+          ),
+        ),
+      );
+    }
     return const LoginScreen();
   }
 }

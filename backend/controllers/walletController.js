@@ -22,10 +22,10 @@ exports.requestWithdrawal = async (req, res) => {
 
     const user = await User.findById(req.user.id);
     if (amount > user.walletBalance) {
-      return res.status(400).json({ message: `Insufficient balance. Available: $${user.walletBalance}` });
+      return res.status(400).json({ message: `Insufficient balance. Available: ₹${user.walletBalance}` });
     }
     if (amount > user.withdrawLimit) {
-      return res.status(400).json({ message: `Withdrawal limit exceeded. Your current limit is: $${user.withdrawLimit}` });
+      return res.status(400).json({ message: `Withdrawal limit exceeded. Your current limit is: ₹${user.withdrawLimit}` });
     }
 
     const transaction = new Transaction({
@@ -89,7 +89,7 @@ exports.deposit = async (req, res) => {
     const notification = new Notification({
       userId,
       title: 'Money Received',
-      message: `A deposit of $${amount} has been added to your wallet.`,
+      message: `A deposit of ₹${amount} has been added to your wallet.`,
       type: 'success'
     });
     await notification.save();
@@ -99,7 +99,7 @@ exports.deposit = async (req, res) => {
       await sendPushNotification(
         user.fcmToken,
         'Money Received',
-        `A deposit of $${amount} has been added to your wallet.`
+        `A deposit of ₹${amount} has been added to your wallet.`
       );
     }
 
@@ -164,8 +164,8 @@ exports.approveWithdrawal = async (req, res) => {
       userId: transaction.userId,
       title: status === 'approved' ? 'Withdrawal Approved' : 'Withdrawal Rejected',
       message: status === 'approved' 
-        ? `Your withdrawal request for $${transaction.amount} has been processed.` 
-        : `Your withdrawal request for $${transaction.amount} was not approved.`,
+        ? `Your withdrawal request for ₹${transaction.amount} has been processed.` 
+        : `Your withdrawal request for ₹${transaction.amount} was not approved.`,
       type: status === 'approved' ? 'success' : 'error'
     });
     await notification.save();
@@ -177,8 +177,8 @@ exports.approveWithdrawal = async (req, res) => {
         recipient.fcmToken,
         status === 'approved' ? 'Withdrawal Approved' : 'Withdrawal Rejected',
         status === 'approved' 
-          ? `Your withdrawal request for $${transaction.amount} has been processed.` 
-          : `Your withdrawal request for $${transaction.amount} was not approved.`
+          ? `Your withdrawal request for ₹${transaction.amount} has been processed.` 
+          : `Your withdrawal request for ₹${transaction.amount} was not approved.`
       );
     }
 
