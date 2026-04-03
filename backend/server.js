@@ -11,10 +11,16 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
+app.use((req, res, next) => {
+  console.log(`[BACKEND LOG] ${req.method} ${req.url} | Origin: ${req.get('origin')}`);
+  next();
+});
+
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5174',
   'http://localhost:5175',
+  'http://localhost:5005',
   'https://mlxdirect.com',
   process.env.FRONTEND_URL,
   process.env.ADMIN_URL,
@@ -49,7 +55,7 @@ app.use('/api/banners', require('./routes/bannerRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
 
 app.get('/', (req, res) => {
-  res.send('BOA Backend is running.');
+  res.send('MLX DIRECT Backend is running.');
 });
 
 app.listen(PORT, () => {

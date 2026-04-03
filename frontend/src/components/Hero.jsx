@@ -69,7 +69,7 @@ const Hero = () => {
               <div className="absolute inset-0 w-16 h-16 rounded-full border border-primary-green animate-ping opacity-20 group-hover:opacity-0"></div>
             </div>
             <span className="text-sm font-black tracking-widest uppercase group-hover:text-primary-green transition-colors">
-              Explore BOA
+              Explore MLX DIRECT
             </span>
           </div>
 

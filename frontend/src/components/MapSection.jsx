@@ -68,7 +68,7 @@ const MapSection = () => {
                 <span className="w-4 h-[1px] bg-primary-green"></span> Contact Suite
               </p>
               <p className="text-lg font-bold text-gray-800 tracking-tight mb-1">+1 (806) 429 1952</p>
-              <p className="text-sm font-medium text-primary-green lowercase">admin@boa.com</p>
+              <p className="text-sm font-medium text-primary-green lowercase">admin@mlxdirect.com</p>
             </div>
 
             <div className="pt-6 border-t border-gray-100">

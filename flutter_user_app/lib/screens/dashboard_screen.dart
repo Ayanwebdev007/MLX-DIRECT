@@ -6,6 +6,8 @@ import 'package:carousel_slider/carousel_slider.dart';
 import '../providers/wallet_provider.dart';
 import '../services/firebase_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import '../utils/app_theme.dart';
+import '../providers/notification_provider.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -21,6 +23,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
     _setupFirebase();
+    // Fetch initial notifications so the badge appears immediately if there are unread messages
+    Future.microtask(() {
+      Provider.of<NotificationProvider>(context, listen: false).fetchNotifications();
+    });
   }
 
   void _setupFirebase() async {
@@ -111,7 +117,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               controller: _amountController,
               decoration: const InputDecoration(
                 hintText: '0.00',
-                prefixIcon: Icon(FontAwesomeIcons.dollarSign, size: 16),
+                prefixIcon: Icon(FontAwesomeIcons.indianRupeeSign, size: 16),
                 labelText: 'Amount to Withdraw',
               ),
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -159,33 +165,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       child: Text(user.name.substring(0, 2).toUpperCase(), style: const TextStyle(color: Colors.pink, fontWeight: FontWeight.bold, fontSize: 13)),
                     ),
                   ),
-                  title: const Text(
-                    'BOA Wallet',
+                  title: Text(
+                    'BOA PAY',
                     style: TextStyle(color: AppTheme.darkSlate, fontWeight: FontWeight.w600, fontSize: 17),
                   ),
                   actions: [
-                    Consumer<NotificationProvider>(
-                      builder: (context, notificationProvider, _) => Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.notifications_none_rounded, color: AppTheme.darkSlate),
-                            onPressed: () => Navigator.pushNamed(context, '/notifications'),
-                          ),
-                          if (notificationProvider.unreadCount > 0)
-                            Positioned(
-                              right: 12, top: 12,
-                              child: Container(
-                                padding: const EdgeInsets.all(4),
-                                decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
-                                child: Text(
-                                  '${notificationProvider.unreadCount}',
-                                  style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
+                    IconButton(
+                      icon: Consumer<NotificationProvider>(
+                        builder: (context, notificationProvider, _) => Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            const Icon(Icons.notifications_none_rounded, color: AppTheme.darkSlate),
+                            if (notificationProvider.unreadCount > 0)
+                              Positioned(
+                                right: -4, top: -4,
+                                child: Container(
+                                  padding: const EdgeInsets.all(2),
+                                  constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                                  decoration: BoxDecoration(color: Colors.red, shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 2)),
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    '${notificationProvider.unreadCount}',
+                                    style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
+                                  ),
                                 ),
                               ),
-                            ),
-                        ],
+                          ],
+                        ),
                       ),
+                      onPressed: () => Navigator.pushNamed(context, '/notifications'),
                     ),
                     IconButton(
                       icon: const Icon(Icons.logout_rounded, color: AppTheme.darkSlate),
@@ -332,7 +340,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       _SupportTile(
                         icon: FontAwesomeIcons.circleExclamation, 
                         title: 'About Us', 
-                        subtitle: 'Learn more about BOA Wallet',
+                        subtitle: 'Learn more about BOA PAY',
                         onTap: () => Navigator.pushNamed(context, '/about'),
                       ),
                       

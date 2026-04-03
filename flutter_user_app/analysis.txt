@@ -1,0 +1,54 @@
+﻿Analyzing flutter_user_app...
+
+  error - lib\providers\notification_provider.dart:74:41 - The method 'patch' isn't defined for the type 'ApiService'. Try correcting the name to the name of an existing method, or defining a method named 'patch'. - undefined_method
+  error - lib\services\api_service.dart:13:25 - Undefined name 'SharedPreferences'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\services\api_service.dart:25:17 - The name 'Response' isn't a type, so it can't be used as a type argument. Try correcting the name to an existing type, or defining a type named 'Response'. - non_type_as_type_argument
+  error - lib\services\api_service.dart:27:18 - Undefined name 'http'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\services\api_service.dart:30:13 - The method 'jsonEncode' isn't defined for the type 'ApiService'. Try correcting the name to the name of an existing method, or defining a method named 'jsonEncode'. - undefined_method
+  error - lib\services\api_service.dart:34:17 - The name 'Response' isn't a type, so it can't be used as a type argument. Try correcting the name to an existing type, or defining a type named 'Response'. - non_type_as_type_argument
+  error - lib\services\api_service.dart:36:18 - Undefined name 'http'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+warning - lib\screens\notification_screen.dart:4:8 - Unused import: 'package:font_awesome_flutter/font_awesome_flutter.dart'. Try removing the import directive. - unused_import
+warning - lib\screens\register_screen.dart:3:8 - Unused import: 'package:font_awesome_flutter/font_awesome_flutter.dart'. Try removing the import directive. - unused_import
+warning - lib\services\firebase_service.dart:3:8 - Unused import: 'dart:convert'. Try removing the import directive. - unused_import
+   info - lib\main.dart:20:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\main.dart:66:3 - Invalid use of a private type in a public API. Try making the private type public, or making the API that uses the private type also be private. - library_private_types_in_public_api
+   info - lib\main.dart:74:35 - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check. - use_build_context_synchronously
+   info - lib\providers\notification_provider.dart:60:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\providers\notification_provider.dart:80:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\providers\wallet_provider.dart:41:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\providers\wallet_provider.dart:70:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\providers\wallet_provider.dart:111:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\providers\wallet_provider.dart:126:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\screens\dashboard_screen.dart:16:3 - Invalid use of a private type in a public API. Try making the private type public, or making the API that uses the private type also be private. - library_private_types_in_public_api
+   info - lib\screens\dashboard_screen.dart:126:53 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\screens\dashboard_screen.dart:237:65 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\screens\dashboard_screen.dart:262:59 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\screens\dashboard_screen.dart:277:31 - Unnecessary use of string interpolation. Try replacing the string literal with the variable name. - unnecessary_string_interpolations
+   info - lib\screens\dashboard_screen.dart:355:9 - Parameter 'key' could be a super parameter. Trying converting 'key' to a super parameter. - use_super_parameters
+   info - lib\screens\dashboard_screen.dart:400:84 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\screens\dashboard_screen.dart:436:48 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\screens\dashboard_screen.dart:437:48 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\screens\dashboard_screen.dart:438:48 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\screens\dashboard_screen.dart:498:49 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\screens\dashboard_screen.dart:538:43 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\screens\dashboard_screen.dart:545:72 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\screens\help_support_screen.dart:30:49 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\screens\history_screen.dart:56:53 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\screens\history_screen.dart:64:70 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\screens\history_screen.dart:64:108 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\screens\history_screen.dart:132:46 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\screens\login_screen.dart:11:3 - Invalid use of a private type in a public API. Try making the private type public, or making the API that uses the private type also be private. - library_private_types_in_public_api
+   info - lib\screens\login_screen.dart:59:55 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\screens\notification_screen.dart:12:3 - Invalid use of a private type in a public API. Try making the private type public, or making the API that uses the private type also be private. - library_private_types_in_public_api
+   info - lib\screens\notification_screen.dart:20:58 - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check. - use_build_context_synchronously
+   info - lib\screens\notification_screen.dart:74:53 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\screens\notification_screen.dart:149:46 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\screens\register_screen.dart:11:3 - Invalid use of a private type in a public API. Try making the private type public, or making the API that uses the private type also be private. - library_private_types_in_public_api
+   info - lib\services\firebase_service.dart:17:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\services\firebase_service.dart:22:9 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\services\firebase_service.dart:39:9 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\services\firebase_service.dart:42:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\services\firebase_service.dart:48:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\services\firebase_service.dart:53:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+
+50 issues found.

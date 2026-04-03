@@ -30,13 +30,13 @@ class AboutUsScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 32),
-              const Text(
-                'About BOA Wallet',
+              Text(
+                'About BOA PAY Wallet',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppTheme.darkSlate),
               ),
               const SizedBox(height: 16),
               Text(
-                'BOA Wallet is a cutting-edge financial platform designed to provide a secure and seamless payment experience. Our mission is to simplify transactions for everyone, from bill payments to global transfers.',
+                'BOA PAY Wallet is a cutting-edge financial platform designed to provide a secure and seamless payment experience. Our mission is to simplify transactions for everyone, from bill payments to global transfers.',
                 style: TextStyle(fontSize: 16, height: 1.6, color: Colors.grey.shade700),
               ),
               const SizedBox(height: 24),
@@ -61,7 +61,7 @@ class AboutUsScreen extends StatelessWidget {
               const SizedBox(height: 48),
               const Center(
                 child: Text(
-                  'Version 4.0.0 (BOA Global)',
+                  'Version 4.0.0 (MLX DIRECT Global)',
                   style: TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.w500),
                 ),
               ),

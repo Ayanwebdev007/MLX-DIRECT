@@ -9,7 +9,7 @@ async function scan() {
     const admin = client.db().admin();
     const dbs = await admin.listDatabases();
     
-    console.log('--- BOA ATLAS PRODUCTION SCAN ---');
+    console.log('--- MLX DIRECT ATLAS PRODUCTION SCAN ---');
     for (const dbInfo of dbs.databases) {
       if (['admin', 'config', 'local'].includes(dbInfo.name)) continue;
       

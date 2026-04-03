@@ -27,7 +27,7 @@ class NotificationModel {
       message: json['message'],
       type: json['type'],
       isRead: json['isRead'],
-      createdAt: DateTime.parse(json['createdAt']),
+      createdAt: DateTime.parse(json['createdAt']).toUtc(),
     );
   }
 }

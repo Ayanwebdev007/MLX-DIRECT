@@ -6,7 +6,7 @@ const Navbar = () => {
     <nav className="bg-white shadow-md sticky top-0 z-50 py-0 animate-fade-in-down">
       <div className="max-w-7xl mx-auto px-4 flex justify-between items-center h-24">
         <Link to="/" className="logo flex-shrink-0 h-24 flex items-center pr-10">
-          <img src="/logo.png" alt="BOA Logo" className="h-16 w-auto object-contain max-w-[220px] transition-all duration-500 hover:scale-105" />
+          <img src="/logo.png" alt="MLX DIRECT Logo" className="h-16 w-auto object-contain max-w-[220px] transition-all duration-500 hover:scale-105" />
         </Link>
         <ul className="hidden lg:flex gap-8 font-semibold text-gray-700">
           <li><Link to="/" className="hover:text-primary-green transition-colors">Home</Link></li>

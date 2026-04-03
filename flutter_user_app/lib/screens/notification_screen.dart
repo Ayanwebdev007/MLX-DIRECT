@@ -94,7 +94,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                             ),
                             const SizedBox(height: 12),
                             Text(
-                              DateFormat('MMM dd, yyyy • hh:mm a').format(notification.createdAt),
+                              DateFormat('MMM dd, yyyy • hh:mm a').format(notification.createdAt.toLocal()),
                               style: TextStyle(color: Colors.grey.shade400, fontSize: 11, fontWeight: FontWeight.w600),
                             ),
                           ],

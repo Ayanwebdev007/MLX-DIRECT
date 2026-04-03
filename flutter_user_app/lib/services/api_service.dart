@@ -1,11 +1,14 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
   // Use environment define for production, fallback to localhost for development
   static const String baseUrl = String.fromEnvironment(
     'API_URL',
     defaultValue: kIsWeb 
-      ? 'https://mlxdirect.com/api' 
+      ? 'http://localhost:5000/api' 
       : 'http://10.0.2.2:5000/api', // Android Emulator
   );
   
@@ -36,6 +39,15 @@ class ApiService {
     return await http.get(
       Uri.parse('$baseUrl$endpoint'),
       headers: headers,
+    );
+  }
+
+  static Future<http.Response> patch(String endpoint, Map<String, dynamic> body) async {
+    final headers = await getHeaders();
+    return await http.patch(
+      Uri.parse('$baseUrl$endpoint'),
+      headers: headers,
+      body: jsonEncode(body),
     );
   }
 }

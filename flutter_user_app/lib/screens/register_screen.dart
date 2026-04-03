@@ -56,13 +56,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
             children: [
               const SizedBox(height: 20),
               // Header
-              const Text(
+              Text(
                 'Create Your Profile',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: AppTheme.darkSlate),
               ),
               const SizedBox(height: 8),
-              const Text(
-                'Join the BOA elite ecosystem',
+              Text(
+                'Join the BOA PAY elite ecosystem',
                 style: TextStyle(fontSize: 14, color: Colors.grey, fontWeight: FontWeight.w500),
               ),
               const SizedBox(height: 40),

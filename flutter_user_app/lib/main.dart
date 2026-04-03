@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/wallet_provider.dart';
@@ -22,8 +23,32 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  print('--- BOA PAY: INITIALIZING ECOSYSTEM ---');
+
+  // Safely initialize Firebase without blocking the UI thread indefinitely
+  try {
+    if (kIsWeb) {
+      await Firebase.initializeApp(
+        options: const FirebaseOptions(
+          apiKey: 'AIzaSyAanFDmKoOBDSFQSP6p0yv3Z6VmSRSqaU4',
+          appId: '1:654537241880:android:26f552f24525951bd01a6d',
+          messagingSenderId: '654537241880',
+          projectId: 'boa-platform',
+          storageBucket: 'boa-platform.firebasestorage.app',
+        ),
+      ).timeout(const Duration(seconds: 5), onTimeout: () {
+          print('Firebase initialization timed out. Proceeding to App UI...');
+          return Firebase.app(); // Return existing app instance if possible
+      });
+      print('Firebase Web Initialized');
+    } else {
+      await Firebase.initializeApp();
+      FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+      print('Firebase Mobile Initialized');
+    }
+  } catch (e) {
+    print('Firebase Initialization Notice: $e');
+  }
   
   runApp(
     MultiProvider(
@@ -42,7 +67,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'BOA',
+      title: 'BOA PAY',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       home: const LoginWrapper(),

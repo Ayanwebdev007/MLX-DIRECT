@@ -9,7 +9,7 @@ async function scan() {
     const admin = client.db().admin();
     const dbs = await admin.listDatabases();
     
-    console.log('--- BOA DEEP ATLAS DISCOVERY ---');
+    console.log('--- MLX DIRECT DEEP ATLAS DISCOVERY ---');
     for (const dbInfo of dbs.databases) {
       console.log(`\nDATABASE: ${dbInfo.name}`);
       const db = client.db(dbInfo.name);

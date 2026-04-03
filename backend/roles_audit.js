@@ -9,7 +9,7 @@ async function run() {
     const db = client.db('test');
     const users = await db.collection('users').find({}).toArray();
     
-    console.log('--- BOA USER ROLE AUDIT ---');
+    console.log('--- MLX DIRECT USER ROLE AUDIT ---');
     console.log(`TOTAL USERS: ${users.length}`);
     
     users.forEach(u => {

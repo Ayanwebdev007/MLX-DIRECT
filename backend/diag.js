@@ -9,7 +9,7 @@ async function run() {
     const admin = client.db().admin();
     const dbs = await admin.listDatabases();
     
-    console.log('--- BOA ATLAS DISCOVERY ---');
+    console.log('--- MLX DIRECT ATLAS DISCOVERY ---');
     for (const dbInfo of dbs.databases) {
       const db = client.db(dbInfo.name);
       const collections = await db.listCollections().toArray();

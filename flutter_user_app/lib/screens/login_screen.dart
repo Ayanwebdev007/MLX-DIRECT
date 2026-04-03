@@ -67,11 +67,11 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 40),
               // Welcome Text
-              const Center(
+              Center(
                 child: Column(
                   children: [
                     Text(
-                      'BOA',
+                      'BOA PAY',
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w900,

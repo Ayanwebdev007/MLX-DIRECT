@@ -35,7 +35,7 @@ const AboutUs = () => {
         <div className={`mb-16 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <div className="flex items-center gap-4 mb-6">
             <div className="bg-primary-green px-4 py-1 rounded-full">
-              <span className="text-white font-black text-xs uppercase tracking-[0.2em]">About BOA</span>
+              <span className="text-white font-black text-xs uppercase tracking-[0.2em]">About MLX DIRECT</span>
             </div>
             <div className="h-[1px] w-24 bg-primary-green/20"></div>
           </div>
@@ -48,19 +48,19 @@ const AboutUs = () => {
           <div className="mt-12 max-w-4xl space-y-8">
              <div className="border-l-4 border-primary-green pl-10 py-4">
                 <p className="text-xl md:text-2xl font-light text-gray-700 leading-snug tracking-tight">
-                  Since our first day in business, <span className="text-gray-900 font-bold">BOA</span> has been offering our customers the best safety in the domain of radiology.
+                  Since our first day in business, <span className="text-gray-900 font-bold">MLX DIRECT</span> has been offering our customers the best safety in the domain of radiology.
                 </p>
              </div>
              <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pl-10 pr-6">
                 <p className="text-sm font-medium text-gray-500 leading-relaxed uppercase tracking-widest">
-                  BOA conveys both knowledge and information for understanding technologies—from radiography safety to <span className="text-primary-green">solid waste management</span> engineering.
+                  MLX DIRECT conveys both knowledge and information for understanding technologies—from radiography safety to <span className="text-primary-green">solid waste management</span> engineering.
                 </p>
                 <div className="space-y-4">
                    <p className="text-sm font-bold text-gray-900 leading-relaxed uppercase tracking-[0.2em] underline decoration-primary-green underline-offset-8">
                      More Than Just a Name.
                    </p>
                    <p className="text-xs font-medium text-gray-500 leading-relaxed">
-                     BOA is a premier brand in radiation safety. We are the "one source" global technology provider for certification, testing, and inspection.
+                     MLX DIRECT is a premier brand in radiation safety. We are the "one source" global technology provider for certification, testing, and inspection.
                    </p>
                 </div>
              </div>
@@ -76,7 +76,7 @@ const AboutUs = () => {
             <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-gray-900/40 to-transparent p-10 flex flex-col justify-end">
               <h4 className="text-xl font-bold text-white mb-3">Strategic Technical Synergy</h4>
               <p className="text-gray-300 font-light text-sm max-w-lg">
-                BOA bridges technical excellence with global operational intelligence, turn technical challenges into elite-scale competitive advantages.
+                MLX DIRECT bridges technical excellence with global operational intelligence, turn technical challenges into elite-scale competitive advantages.
               </p>
             </div>
             {/* Coordinate Label */}

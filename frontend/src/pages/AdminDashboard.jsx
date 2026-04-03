@@ -55,10 +55,10 @@ const AdminDashboard = () => {
     try {
       if (showModal === 'deposit') {
         await api.post('/wallet/admin/deposit', { userId: selectedUser._id, amount: Number(modalValue) });
-        setMessage(`Successfully added $${modalValue} to ${selectedUser.name}`);
+        setMessage(`Successfully added ₹${modalValue} to ${selectedUser.name}`);
       } else {
         await api.post('/wallet/admin/set-limit', { userId: selectedUser._id, limit: Number(modalValue) });
-        setMessage(`Updated withdrawal limit for ${selectedUser.name} to $${modalValue}`);
+        setMessage(`Updated withdrawal limit for ${selectedUser.name} to ₹${modalValue}`);
       }
       setShowModal(null);
       setModalValue('');
@@ -147,8 +147,11 @@ const AdminDashboard = () => {
     }
   }
 
-  const totalSystemBalance = users.reduce((acc, user) => acc + user.walletBalance, 0);
-  const filteredUsers = users.filter(u => u.name.toLowerCase().includes(searchTerm.toLowerCase()) || u.email.toLowerCase().includes(searchTerm.toLowerCase()));
+  const totalSystemBalance = (users || []).reduce((acc, user) => acc + (user?.walletBalance || 0), 0);
+  const filteredUsers = (users || []).filter(u => 
+    (u?.name?.toLowerCase().includes((searchTerm || '').toLowerCase())) || 
+    (u?.email?.toLowerCase().includes((searchTerm || '').toLowerCase()))
+  );
 
   const StatCard = ({ icon: Icon, label, value }) => (
     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex items-center space-x-4">
@@ -157,7 +160,7 @@ const AdminDashboard = () => {
       </div>
       <div>
         <p className="text-gray-500 text-xs font-bold uppercase tracking-wider">{label}</p>
-        <p className="text-2xl font-bold text-gray-900">${value}</p>
+        <p className="text-2xl font-bold text-gray-900">₹{value}</p>
       </div>
     </div>
   );
@@ -170,7 +173,7 @@ const AdminDashboard = () => {
           <div className="w-8 h-8 bg-[#16a34a] rounded flex items-center justify-center text-white">
             <FaUserShield size={18} />
           </div>
-          <span className="text-lg font-bold text-white tracking-tight">BOA <span className="text-[#16a34a]">PANEL</span></span>
+          <span className="text-lg font-bold text-white tracking-tight">MLX DIRECT <span className="text-[#16a34a]">PANEL</span></span>
         </div>
 
         <nav className="flex-1 px-3 space-y-1">
@@ -221,7 +224,7 @@ const AdminDashboard = () => {
               {activeTab === 'withdrawals' && 'Withdrawal Requests'}
               {activeTab === 'banners' && 'Banner Management'}
             </h1>
-            <p className="text-sm text-gray-500">Manage your BOA platform</p>
+            <p className="text-sm text-gray-500">Manage your MLX DIRECT platform</p>
           </div>
           
           <div className="flex items-center space-x-3">
@@ -244,19 +247,19 @@ const AdminDashboard = () => {
                 <button onClick={() => setActiveTab('users')} className="text-[#16a34a] text-sm font-bold hover:underline">View All Users</button>
               </div>
               <div className="divide-y divide-gray-100">
-                {users.slice(0, 5).map(u => (
+                {(users || []).slice(0, 5).map(u => (
                   <div key={u._id} className="p-4 flex justify-between items-center hover:bg-gray-50 transition-colors">
                     <div className="flex items-center space-x-4">
                       <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 font-bold uppercase text-xs border border-gray-200">
-                        {u.name[0]}
+                        {(u?.name || 'U')[0]}
                       </div>
                       <div>
-                        <p className="font-bold text-gray-900 text-sm">{u.name}</p>
-                        <p className="text-xs text-gray-400">{u.email}</p>
+                        <p className="font-bold text-gray-900 text-sm">{u?.name || 'Unnamed User'}</p>
+                        <p className="text-xs text-gray-400">{u?.email || 'No email'}</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-[#16a34a]">${u.walletBalance.toLocaleString()}</p>
+                      <p className="font-bold text-[#16a34a]">₹{(u?.walletBalance || 0).toLocaleString()}</p>
                     </div>
                   </div>
                 ))}
@@ -300,10 +303,10 @@ const AdminDashboard = () => {
                         </div>
                       </td>
                       <td className="px-6 py-5 text-center">
-                        <span className="font-bold text-gray-900">${u.walletBalance.toLocaleString()}</span>
+                        <span className="font-bold text-gray-900">₹{u.walletBalance.toLocaleString()}</span>
                       </td>
                       <td className="px-6 py-5 text-center">
-                        <span className="font-bold text-[#16a34a]">${u.withdrawLimit.toLocaleString()}</span>
+                        <span className="font-bold text-[#16a34a]">₹{u.withdrawLimit.toLocaleString()}</span>
                       </td>
                       <td className="px-6 py-5 text-right">
                         <div className="flex justify-end space-x-2">
@@ -355,7 +358,7 @@ const AdminDashboard = () => {
                           {new Date(w.createdAt).toLocaleDateString()}
                         </td>
                         <td className="px-6 py-5 text-center">
-                          <span className="text-lg font-bold text-[#16a34a]">${w.amount.toLocaleString()}</span>
+                          <span className="text-lg font-bold text-[#16a34a]">₹{w.amount.toLocaleString()}</span>
                         </td>
                         <td className="px-6 py-5 text-right">
                           <div className="flex justify-end space-x-2">
@@ -411,7 +414,7 @@ const AdminDashboard = () => {
                     <input 
                       type="text" 
                       className="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#16a34a]/20 focus:border-[#16a34a] outline-none text-sm transition-all"
-                      placeholder="https://boa.com/promo"
+                      placeholder="https://mlxdirect.com/promo"
                       value={bannerLink}
                       onChange={(e) => setBannerLink(e.target.value)}
                     />
@@ -551,7 +554,7 @@ const AdminDashboard = () => {
                     {showModal === 'deposit' ? 'Enter Amount to Credit' : 'Enter New Maximum Limit'}
                   </label>
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-lg">$</span>
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-lg">₹</span>
                     <input 
                       type="number" 
                       className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-lg focus:border-[#16a34a] focus:ring-1 focus:ring-[#16a34a] outline-none transition-all text-xl font-bold"

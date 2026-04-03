@@ -13,9 +13,9 @@ services:
       - key: NODE_ENV
         value: production
       - key: MONGODB_URI
-        sync: false # Set this manually in Render Dashboard for security
+        value: mongodb+srv://<db_user>:<password>@cluster0.p2cwdjy.mongodb.net/ # Set in Render Dashboard
       - key: JWT_SECRET
-        sync: false # Set this manually in Render Dashboard for security
+        value: YOUR_JWT_SECRET # Set in Render Dashboard
       - key: FRONTEND_URL
         value: https://mlxdirect.com
       - key: ADMIN_URL
@@ -23,11 +23,11 @@ services:
       - key: MOBILE_WEB_URL
         value: https://mlxdirect.com
       - key: FIREBASE_CONFIG_JSON
-        sync: false # Copy the content of your firebase-admin-sdk.json into this variable in Render
+        value: '{"type":"service_account","project_id":"your-project-id"}' # Set full JSON in Render Dashboard
       - key: ADMIN_EMAIL
         value: admin@mlxdirect.com
       - key: ADMIN_PASSWORD
-        value: admin123
+        value: YOUR_ADMIN_PASSWORD # Set in Render Dashboard
 
   # Frontend Static Site
   - type: web

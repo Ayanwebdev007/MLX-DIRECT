@@ -33,6 +33,27 @@
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
-  <script src="flutter_bootstrap.js" async></script>
+  <div id="loading" style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; background: #1a1a2e; color: #fff;">
+    <div style="text-align: center;">
+      <h2 style="font-weight: 900; letter-spacing: 2px;">BOA PAY</h2>
+      <div style="width: 100px; height: 2px; background: #4dc; margin: 20px auto; border-radius: 2px;"></div>
+      <p style="color: #88c; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Starting the Ecosystem</p>
+    </div>
+  </div>
+  <script src="flutter.js" defer></script>
+  <script>
+    window.addEventListener('load', function(ev) {
+      _flutter.loader.loadEntrypoint({
+        serviceWorker: {
+          timeoutMillis: 4000,
+        },
+        onEntrypointLoaded: function(engineInitializer) {
+          engineInitializer.initializeEngine().then(function(appRunner) {
+            appRunner.runApp();
+          });
+        }
+      });
+    });
+  </script>
 </body>
 </html>
