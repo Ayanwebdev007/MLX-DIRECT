@@ -34,11 +34,13 @@ const AdminDashboard = () => {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const usersRes = await api.get('/wallet/admin/users');
+      const [usersRes, withRes, bannerRes] = await Promise.all([
+        api.get('/wallet/admin/users'),
+        api.get('/wallet/admin/withdrawals'),
+        api.get('/banners')
+      ]);
       setUsers(usersRes.data);
-      const withRes = await api.get('/wallet/admin/withdrawals');
       setWithdrawals(withRes.data);
-      const bannerRes = await api.get('/banners');
       setBanners(bannerRes.data);
     } catch (err) {
       console.error('Error fetching admin data', err);
@@ -153,14 +155,14 @@ const AdminDashboard = () => {
     (u?.email?.toLowerCase().includes((searchTerm || '').toLowerCase()))
   );
 
-  const StatCard = ({ icon: Icon, label, value }) => (
+  const StatCard = ({ icon: Icon, label, value, isCurrency = true }) => (
     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex items-center space-x-4">
       <div className="w-12 h-12 rounded-lg bg-gray-50 flex items-center justify-center text-[#16a34a] text-xl border border-gray-100">
         <Icon />
       </div>
       <div>
         <p className="text-gray-500 text-xs font-bold uppercase tracking-wider">{label}</p>
-        <p className="text-2xl font-bold text-gray-900">₹{value}</p>
+        <p className="text-2xl font-bold text-gray-900">{isCurrency && '₹'}{value}</p>
       </div>
     </div>
   );
@@ -236,9 +238,9 @@ const AdminDashboard = () => {
         {activeTab === 'overview' && (
           <div className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <StatCard icon={FaUsers} label="Total Users" value={users.length} />
+              <StatCard icon={FaUsers} label="Total Users" value={users.length} isCurrency={false} />
               <StatCard icon={FaWallet} label="Total Balance" value={totalSystemBalance.toLocaleString()} />
-              <StatCard icon={FaTasks} label="Pending Requests" value={withdrawals.length} />
+              <StatCard icon={FaTasks} label="Pending Requests" value={withdrawals.length} isCurrency={false} />
             </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
