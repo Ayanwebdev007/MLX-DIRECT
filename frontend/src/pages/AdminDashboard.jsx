@@ -162,7 +162,9 @@ const AdminDashboard = () => {
       </div>
       <div>
         <p className="text-gray-500 text-xs font-bold uppercase tracking-wider">{label}</p>
-        <p className="text-2xl font-bold text-gray-900">{isCurrency && '₹'}{value}</p>
+        <p className="text-2xl font-bold text-gray-900">
+          {isCurrency === true ? '₹' : ''}{value}
+        </p>
       </div>
     </div>
   );
@@ -238,7 +240,7 @@ const AdminDashboard = () => {
         {activeTab === 'overview' && (
           <div className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <StatCard icon={FaUsers} label="Total Users" value={users.length} isCurrency={false} />
+              <StatCard icon={FaUsers} label="Total Registered Users" value={users.length} isCurrency={false} />
               <StatCard icon={FaWallet} label="Total Balance" value={totalSystemBalance.toLocaleString()} />
               <StatCard icon={FaTasks} label="Pending Requests" value={withdrawals.length} isCurrency={false} />
             </div>
