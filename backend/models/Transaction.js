@@ -22,6 +22,15 @@ const transactionSchema = new mongoose.Schema({
   },
   description: {
     type: String,
+  },
+  payoutId: {
+    type: String,
+    default: null
+  },
+  payoutStatus: {
+    type: String,
+    enum: ['none', 'pending', 'processed', 'reversed', 'failed'],
+    default: 'none'
   }
 }, { timestamps: true });
 

@@ -1,0 +1,193 @@
+[dotenv@17.3.1] injecting env (8) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+Push notifications will be disabled.
+Server is running on port 5000
+Connected to MongoDB
+[BACKEND LOG] OPTIONS /api/wallet/admin/stats | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/wallet/admin/stats | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/stats | Origin: http://localhost:5173
+[Stats API] Aggregating from: 2026-04-01T18:30:00.000Z
+[Stats API] Raw Aggregation Count: 4
+[Stats API] Final volumeHistory days: 7
+[BACKEND LOG] GET /api/wallet/admin/stats | Origin: http://localhost:5173
+[Stats API] Aggregating from: 2026-04-01T18:30:00.000Z
+[Stats API] Raw Aggregation Count: 4
+[Stats API] Final volumeHistory days: 7
+[BACKEND LOG] OPTIONS /api/wallet/admin/users | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/users | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/wallet/admin/deposit | Origin: http://localhost:5173
+[BACKEND LOG] POST /api/wallet/admin/deposit | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/wallet/admin/users | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/users | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/wallet/admin/stats | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/stats | Origin: http://localhost:5173
+[Stats API] Aggregating from: 2026-04-01T18:30:00.000Z
+[Stats API] Raw Aggregation Count: 4
+[Stats API] Final volumeHistory days: 7
+[BACKEND LOG] OPTIONS /api/wallet/admin/stats | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/wallet/admin/stats | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/stats | Origin: http://localhost:5173
+[Stats API] Aggregating from: 2026-04-01T18:30:00.000Z
+[Stats API] Raw Aggregation Count: 4
+[Stats API] Final volumeHistory days: 7
+[BACKEND LOG] GET /api/wallet/admin/stats | Origin: http://localhost:5173
+[Stats API] Aggregating from: 2026-04-01T18:30:00.000Z
+[Stats API] Raw Aggregation Count: 4
+[Stats API] Final volumeHistory days: 7
+[BACKEND LOG] OPTIONS /api/wallet/admin/users | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/users | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/wallet/admin/stats | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/stats | Origin: http://localhost:5173
+[Stats API] Aggregating from: 2026-04-01T18:30:00.000Z
+[Stats API] Raw Aggregation Count: 4
+[Stats API] Final volumeHistory days: 7
+[BACKEND LOG] OPTIONS /api/wallet/admin/users | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/users | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/wallet/admin/withdrawals | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/withdrawals | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/banners | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/banners | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/withdrawals | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/wallet/admin/stats | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/stats | Origin: http://localhost:5173
+[Stats API] Aggregating from: 2026-04-01T18:30:00.000Z
+[Stats API] Raw Aggregation Count: 4
+[Stats API] Final volumeHistory days: 7
+[BACKEND LOG] GET /api/wallet/admin/stats | Origin: http://localhost:5173
+[Stats API] Aggregating from: 2026-04-01T18:30:00.000Z
+[Stats API] Raw Aggregation Count: 4
+[Stats API] Final volumeHistory days: 7
+[BACKEND LOG] GET /api/wallet/admin/stats | Origin: http://localhost:5173
+[Stats API] Aggregating from: 2026-04-01T18:30:00.000Z
+[Stats API] Raw Aggregation Count: 4
+[Stats API] Final volumeHistory days: 7
+[BACKEND LOG] OPTIONS /api/wallet/admin/stats | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/stats | Origin: http://localhost:5173
+[Stats API] Aggregating from: 2026-04-01T18:30:00.000Z
+[Stats API] Raw Aggregation Count: 4
+[Stats API] Final volumeHistory days: 7
+[BACKEND LOG] OPTIONS /api/wallet/admin/users | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/users | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/wallet/admin/withdrawals | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/withdrawals | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/banners | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/banners | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/users | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/wallet/admin/stats | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/stats | Origin: http://localhost:5173
+[Stats API] Aggregating from: 2026-04-01T18:30:00.000Z
+[Stats API] Raw Aggregation Count: 4
+[Stats API] Final volumeHistory days: 7
+[BACKEND LOG] OPTIONS /api/wallet/admin/users | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/users | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/wallet/admin/withdrawals | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/withdrawals | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/banners | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/banners | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/wallet/admin/stats | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/stats | Origin: http://localhost:5173
+[Stats API] Aggregating from: 2026-04-01T18:30:00.000Z
+[Stats API] Raw Aggregation Count: 4
+[Stats API] Final volumeHistory days: 7
+[BACKEND LOG] OPTIONS /api/wallet/admin/stats | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/wallet/admin/stats | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/stats | Origin: http://localhost:5173
+[Stats API] Aggregating from: 2026-04-01T18:30:00.000Z
+[Stats API] Raw Aggregation Count: 4
+[Stats API] Final volumeHistory days: 7
+[BACKEND LOG] GET /api/wallet/admin/stats | Origin: http://localhost:5173
+[Stats API] Aggregating from: 2026-04-01T18:30:00.000Z
+[Stats API] Raw Aggregation Count: 4
+[Stats API] Final volumeHistory days: 7
+[BACKEND LOG] OPTIONS /api/wallet/admin/withdrawals | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/withdrawals | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/wallet/admin/stats | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/stats | Origin: http://localhost:5173
+[Stats API] Aggregating from: 2026-04-01T18:30:00.000Z
+[Stats API] Raw Aggregation Count: 4
+[Stats API] Final volumeHistory days: 7
+[BACKEND LOG] OPTIONS /api/wallet/admin/users | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/users | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/auth/me | Origin: http://localhost:8000
+[BACKEND LOG] GET /api/auth/me | Origin: http://localhost:8000
+[BACKEND LOG] OPTIONS /api/wallet/transactions | Origin: http://localhost:8000
+[BACKEND LOG] GET /api/wallet/transactions | Origin: http://localhost:8000
+[BACKEND LOG] OPTIONS /api/banners | Origin: http://localhost:8000
+[BACKEND LOG] GET /api/banners | Origin: http://localhost:8000
+[BACKEND LOG] OPTIONS /api/notifications | Origin: http://localhost:8000
+[BACKEND LOG] GET /api/notifications | Origin: http://localhost:8000
+[BACKEND LOG] OPTIONS /api/wallet/admin/withdrawals | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/withdrawals | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/banners | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/banners | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/wallet/admin/stats | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/stats | Origin: http://localhost:5173
+[Stats API] Aggregating from: 2026-04-01T18:30:00.000Z
+[Stats API] Raw Aggregation Count: 4
+[Stats API] Final volumeHistory days: 7
+[BACKEND LOG] GET /api/banners | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/stats | Origin: http://localhost:5173
+[Stats API] Aggregating from: 2026-04-01T18:30:00.000Z
+[Stats API] Raw Aggregation Count: 4
+[Stats API] Final volumeHistory days: 7
+[BACKEND LOG] OPTIONS /api/wallet/admin/users | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/users | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/wallet/admin/withdrawals | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/withdrawals | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/wallet/admin/stats | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/stats | Origin: http://localhost:5173
+[Stats API] Aggregating from: 2026-04-01T18:30:00.000Z
+[Stats API] Raw Aggregation Count: 4
+[Stats API] Final volumeHistory days: 7
+[BACKEND LOG] OPTIONS /api/wallet/admin/users | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/users | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/wallet/admin/withdrawals | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/withdrawals | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/banners | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/banners | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/wallet/admin/stats | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/stats | Origin: http://localhost:5173
+[Stats API] Aggregating from: 2026-04-01T18:30:00.000Z
+[Stats API] Raw Aggregation Count: 4
+[Stats API] Final volumeHistory days: 7
+[BACKEND LOG] OPTIONS /api/notifications | Origin: http://localhost:8000
+[BACKEND LOG] OPTIONS /api/notifications/read-all | Origin: http://localhost:8000
+[BACKEND LOG] PATCH /api/notifications/read-all | Origin: http://localhost:8000
+[BACKEND LOG] GET /api/notifications | Origin: http://localhost:8000
+[BACKEND LOG] GET /api/notifications | Origin: http://localhost:8000
+[BACKEND LOG] OPTIONS /api/wallet/admin/users | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/users | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/wallet/admin/user/69ce5793ef865390e90d4de0 | Origin: http://localhost:5173
+[BACKEND LOG] DELETE /api/wallet/admin/user/69ce5793ef865390e90d4de0 | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/wallet/admin/stats | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/stats | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/wallet/admin/stats | Origin: http://localhost:5173
+[Stats API] Aggregating from: 2026-04-01T18:30:00.000Z
+[Stats API] Raw Aggregation Count: 4
+[Stats API] Final volumeHistory days: 7
+[BACKEND LOG] GET /api/wallet/admin/stats | Origin: http://localhost:5173
+[Stats API] Aggregating from: 2026-04-01T18:30:00.000Z
+[Stats API] Raw Aggregation Count: 4
+[Stats API] Final volumeHistory days: 7
+[BACKEND LOG] OPTIONS /api/wallet/admin/users | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/users | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/wallet/admin/user/69ce5793ef865390e90d4de0 | Origin: http://localhost:5173
+[BACKEND LOG] DELETE /api/wallet/admin/user/69ce5793ef865390e90d4de0 | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/wallet/admin/stats | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/stats | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/wallet/admin/stats | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/stats | Origin: http://localhost:5173
+[Stats API] Aggregating from: 2026-04-01T18:30:00.000Z
+[Stats API] Aggregating from: 2026-04-01T18:30:00.000Z
+[Stats API] Raw Aggregation Count: 4
+[Stats API] Final volumeHistory days: 7
+[Stats API] Raw Aggregation Count: 4
+[Stats API] Final volumeHistory days: 7
+[BACKEND LOG] OPTIONS /api/wallet/admin/users | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/users | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/wallet/admin/user/69ce5793ef865390e90d4de0 | Origin: http://localhost:5173
+[BACKEND LOG] DELETE /api/wallet/admin/user/69ce5793ef865390e90d4de0 | Origin: http://localhost:5173
+[BACKEND LOG] OPTIONS /api/wallet/admin/stats | Origin: http://localhost:5173
+[BACKEND LOG] GET /api/wallet/admin/stats | Origin: http://localhost:5173
+[Stats API] Aggregating from: 2026-04-01T18:30:00.000Z
+[Stats API] Raw Aggregation Count: 4
+[Stats API] Final volumeHistory days: 7

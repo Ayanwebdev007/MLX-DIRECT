@@ -38,7 +38,7 @@ class HistoryScreen extends StatelessWidget {
 
           return RefreshIndicator(
             onRefresh: wallet.fetchData,
-            color: AppTheme.primaryPurple,
+            color: AppTheme.primaryBlue,
             child: ListView.builder(
               padding: const EdgeInsets.all(24),
               itemCount: wallet.transactions.length,
@@ -46,69 +46,188 @@ class HistoryScreen extends StatelessWidget {
                 final tx = wallet.transactions[index];
                 final isDeposit = tx.type == 'deposit';
                 
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4)),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 52, height: 52,
-                        decoration: BoxDecoration(
-                          color: isDeposit ? AppTheme.successEmerald.withOpacity(0.08) : AppTheme.errorRed.withOpacity(0.08),
-                          borderRadius: BorderRadius.circular(18),
+                return InkWell(
+                  onTap: () => _showTransactionDetail(context, tx),
+                  borderRadius: BorderRadius.circular(24),
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4)),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 52, height: 52,
+                          decoration: BoxDecoration(
+                            color: isDeposit ? AppTheme.successEmerald.withOpacity(0.08) : AppTheme.errorRed.withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(18),
+                          ),
+                          child: Icon(
+                            isDeposit ? Icons.south_west_rounded : Icons.north_east_rounded,
+                            color: isDeposit ? AppTheme.successEmerald : AppTheme.errorRed,
+                            size: 20,
+                          ),
                         ),
-                        child: Icon(
-                          isDeposit ? Icons.south_west_rounded : Icons.north_east_rounded,
-                          color: isDeposit ? AppTheme.successEmerald : AppTheme.errorRed,
-                          size: 20,
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                isDeposit ? 'Money Received' : 'Money Sent',
+                                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: AppTheme.darkSlate),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                DateFormat('EEE, MMM dd • hh:mm a').format(tx.createdAt.toLocal()),
+                                style: TextStyle(color: Colors.grey.shade400, fontSize: 11, fontWeight: FontWeight.w600),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Text(
-                              isDeposit ? 'Money Received' : 'Money Sent',
-                              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: AppTheme.darkSlate),
+                              '${isDeposit ? '+' : '-'}${NumberFormat.simpleCurrency(name: 'INR').format(tx.amount)}',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w900, fontSize: 16,
+                                color: isDeposit ? AppTheme.successEmerald : AppTheme.errorRed,
+                                letterSpacing: -0.5,
+                              ),
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              DateFormat('EEE, MMM dd • hh:mm a').format(tx.createdAt.toLocal()),
-                              style: TextStyle(color: Colors.grey.shade400, fontSize: 11, fontWeight: FontWeight.w600),
-                            ),
+                            const SizedBox(height: 6),
+                            _StatusChip(status: tx.status),
                           ],
                         ),
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            '${isDeposit ? '+' : '-'}${NumberFormat.simpleCurrency(name: 'INR').format(tx.amount)}',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w900, fontSize: 16,
-                              color: isDeposit ? AppTheme.successEmerald : AppTheme.errorRed,
-                              letterSpacing: -0.5,
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          _StatusChip(status: tx.status),
-                        ],
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 );
               },
             ),
           );
         },
+      ),
+    );
+  }
+
+  void _showTransactionDetail(BuildContext context, dynamic tx) {
+    final isDeposit = tx.type == 'deposit';
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        contentPadding: const EdgeInsets.all(0),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 32),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryBlue.withOpacity(0.05),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: Center(
+                child: Column(
+                  children: [
+                    Container(
+                      width: 64, height: 64,
+                      decoration: BoxDecoration(
+                        color: isDeposit ? AppTheme.successEmerald : AppTheme.errorRed,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        isDeposit ? Icons.south_west_rounded : Icons.north_east_rounded,
+                        color: Colors.white,
+                        size: 28,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      isDeposit ? 'Money Received' : 'Withdrawal Request',
+                      style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.darkSlate),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '${NumberFormat.simpleCurrency(name: 'INR').format(tx.amount)}',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w900,
+                        color: isDeposit ? AppTheme.successEmerald : AppTheme.errorRed,
+                        letterSpacing: -1,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                children: [
+                  _DetailRow(label: 'Status', value: tx.status.toUpperCase(), isStatus: true),
+                  _DetailRow(label: 'Transaction ID', value: tx.id),
+                  _DetailRow(label: 'Date', value: DateFormat('MMM dd, yyyy').format(tx.createdAt.toLocal())),
+                  _DetailRow(label: 'Time', value: DateFormat('hh:mm a').format(tx.createdAt.toLocal())),
+                  if (tx.description != null && tx.description!.isNotEmpty)
+                    _DetailRow(label: 'Note', value: tx.description!),
+                  const SizedBox(height: 32),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.primaryBlue,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      ),
+                      child: const Text('Close Receipt'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DetailRow extends StatelessWidget {
+  final String label;
+  final String value;
+  final bool isStatus;
+
+  const _DetailRow({required this.label, required this.value, this.isStatus = false});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: TextStyle(color: Colors.grey.shade500, fontSize: 13, fontWeight: FontWeight.w500)),
+          const SizedBox(width: 24),
+          Expanded(
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              style: TextStyle(
+                color: isStatus ? (value == 'APPROVED' ? AppTheme.successEmerald : AppTheme.pendingAmber) : AppTheme.darkSlate,
+                fontWeight: FontWeight.w700,
+                fontSize: 13,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

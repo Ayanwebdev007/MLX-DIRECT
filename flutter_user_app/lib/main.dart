@@ -10,8 +10,8 @@ import 'screens/history_screen.dart';
 import 'screens/notification_screen.dart';
 import 'screens/help_support_screen.dart';
 import 'screens/about_us_screen.dart';
+import 'screens/profile_screen.dart';
 import 'utils/app_theme.dart';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
@@ -79,6 +79,7 @@ class MyApp extends StatelessWidget {
         '/notifications': (ctx) => const NotificationScreen(),
         '/help': (ctx) => const HelpSupportScreen(),
         '/about': (ctx) => const AboutUsScreen(),
+        '/profile': (ctx) => const ProfileScreen(),
       },
     );
   }
@@ -116,23 +117,18 @@ class _LoginWrapperState extends State<LoginWrapper> {
   Widget build(BuildContext context) {
     if (_isChecking) {
       return Scaffold(
-        backgroundColor: const Color(0xFF6B21A8),
+        backgroundColor: AppTheme.primaryBlue,
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                width: 80, height: 80,
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: const Icon(Icons.account_balance_wallet_rounded, color: Colors.white, size: 40),
+              Image.asset(
+                'assets/images/logo.png',
+                width: 140,
+                height: 140,
               ),
-              const SizedBox(height: 24),
-              const Text('BOA PAY', style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w900, letterSpacing: -1)),
-              const SizedBox(height: 32),
-              const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5)),
+              const SizedBox(height: 48),
+              const SizedBox(width: 28, height: 28, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3)),
             ],
           ),
         ),

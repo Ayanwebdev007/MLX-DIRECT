@@ -39,7 +39,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(message.notification?.title ?? "New Notification Received"),
-          backgroundColor: AppTheme.primaryPurple,
+          backgroundColor: AppTheme.primaryBlue,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -50,20 +50,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('$feature feature coming soon!'),
-        backgroundColor: AppTheme.primaryPurple,
+        backgroundColor: AppTheme.primaryBlue,
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 2),
       ),
     );
   }
 
-  void _requestWithdrawal() async {
+  void _requestWithdrawal({Function(String?)? onError}) async {
     final amountText = _amountController.text;
     final amount = double.tryParse(amountText) ?? 0;
+    
     if (amount <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid amount'), backgroundColor: AppTheme.errorRed),
-      );
+      if (onError != null) {
+        onError('Please enter a valid amount');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please enter a valid amount'), backgroundColor: AppTheme.errorRed),
+        );
+      }
       return;
     }
 
@@ -77,62 +82,169 @@ class _DashboardScreenState extends State<DashboardScreen> {
         const SnackBar(content: Text('Withdrawal request submitted!'), backgroundColor: AppTheme.successEmerald, behavior: SnackBarBehavior.floating),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(error), backgroundColor: AppTheme.errorRed, behavior: SnackBarBehavior.floating),
-      );
+      if (onError != null) {
+        onError(error);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error), backgroundColor: AppTheme.errorRed, behavior: SnackBarBehavior.floating),
+        );
+      }
     }
   }
 
   void _showWithdrawModal() {
+    String? modalError;
+    final user = Provider.of<WalletProvider>(context, listen: false).user;
+    
+    // Safety check: User must have verified bank details
+    if (user?.bankDetails['verified'] != true) {
+      modalError = 'Please verify your bank details in Profile first.';
+    }
+    
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
-        ),
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom + 40,
-          top: 40,
-          left: 24,
-          right: 24,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Request Payout',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppTheme.darkSlate, letterSpacing: -0.5),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Funds will be processed to your linked account.',
-              style: TextStyle(fontSize: 14, color: Colors.grey.shade500, fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 32),
-            TextField(
-              controller: _amountController,
-              decoration: const InputDecoration(
-                hintText: '0.00',
-                prefixIcon: Icon(FontAwesomeIcons.indianRupeeSign, size: 16),
-                labelText: 'Amount to Withdraw',
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) => Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
+          ),
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom + 40,
+            top: 24,
+            left: 24,
+            right: 24,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 24),
+                  decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(2)),
+                ),
               ),
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              autofocus: true,
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton(
-              onPressed: _requestWithdrawal,
-              style: ElevatedButton.styleFrom(
-                shadowColor: AppTheme.primaryPurple.withOpacity(0.4),
-                elevation: 10,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Secure Payout',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppTheme.darkSlate, letterSpacing: -0.8),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close_rounded, color: Colors.grey),
+                  ),
+                ],
               ),
-              child: const Text('Confirm Request'),
-            ),
-          ],
+              const SizedBox(height: 8),
+              if (modalError != null)
+                Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.only(bottom: 24),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppTheme.errorRed.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppTheme.errorRed.withOpacity(0.1)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.error_outline_rounded, color: AppTheme.errorRed, size: 20),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          modalError!,
+                          style: const TextStyle(color: AppTheme.errorRed, fontSize: 13, fontWeight: FontWeight.w700),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              else
+                 Row(
+                   children: [
+                     const Icon(Icons.verified_user_rounded, color: AppTheme.successEmerald, size: 14),
+                     const SizedBox(width: 8),
+                     Text(
+                      'Disbursement to verified channel active',
+                      style: TextStyle(fontSize: 12, color: AppTheme.successEmerald, fontWeight: FontWeight.w900, letterSpacing: 0.2),
+                    ),
+                   ],
+                 ),
+              const SizedBox(height: 32),
+              
+              // Amount Input with modern style
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: Colors.grey.shade100),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('REQUEST AMOUNT', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: Colors.grey.shade400, letterSpacing: 1.5)),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: _amountController,
+                      style: const TextStyle(fontSize: 36, fontWeight: FontWeight.w900, letterSpacing: -1),
+                      onChanged: (_) {
+                        if (modalError != null) setModalState(() => modalError = null);
+                      },
+                      decoration: const InputDecoration(
+                        hintText: '0.00',
+                        prefixIcon: Icon(FontAwesomeIcons.indianRupeeSign, size: 24, color: Colors.black),
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      autofocus: true,
+                    ),
+                  ],
+                ),
+              ),
+              
+              const SizedBox(height: 24),
+              // Limit Bar
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Available Limit', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey)),
+                  Text(
+                    NumberFormat.simpleCurrency(name: 'INR').format(user?.withdrawLimit ?? 0),
+                    style: const TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.w900, fontSize: 14),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 40),
+              
+              SizedBox(
+                width: double.infinity,
+                height: 64,
+                child: ElevatedButton(
+                  onPressed: () => _requestWithdrawal(
+                    onError: (error) => setModalState(() => modalError = error),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryBlue,
+                    shadowColor: AppTheme.primaryBlue.withOpacity(0.4),
+                    elevation: 12,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  ),
+                  child: const Text('INITIATE WITHDRAWAL', style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1)),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -149,9 +261,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
           return RefreshIndicator(
             onRefresh: wallet.fetchData,
-            color: AppTheme.primaryPurple,
-            child: CustomScrollView(
-              slivers: [
+            color: AppTheme.primaryBlue,
+            child: SafeArea(
+              bottom: false,
+              child: CustomScrollView(
+                slivers: [
                 SliverAppBar(
                   expandedHeight: 80.0,
                   floating: true,
@@ -160,9 +274,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   elevation: 0,
                   leading: Padding(
                     padding: const EdgeInsets.only(left: 16),
-                    child: CircleAvatar(
-                      backgroundColor: Colors.pink.shade50,
-                      child: Text(user.name.substring(0, 2).toUpperCase(), style: const TextStyle(color: Colors.pink, fontWeight: FontWeight.bold, fontSize: 13)),
+                    child: InkWell(
+                      onTap: () => Navigator.pushNamed(context, '/profile'),
+                      borderRadius: BorderRadius.circular(20),
+                      child: CircleAvatar(
+                        backgroundColor: Colors.pink.shade50,
+                        child: Text(user.name.substring(0, 1).toUpperCase(), 
+                          style: const TextStyle(color: Colors.pink, fontWeight: FontWeight.bold, fontSize: 13)),
+                      ),
                     ),
                   ),
                   title: Text(
@@ -301,7 +420,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                       _SectionHeader(title: 'Recharge & Bill Payment'),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 40),
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -317,7 +436,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                       _SectionHeader(title: 'Ticket Booking'),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 40),
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -329,32 +448,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                       ),
 
-                      const SizedBox(height: 40),
-                      
-                      _SupportTile(
-                        icon: FontAwesomeIcons.circleQuestion, 
-                        title: 'Help and Support', 
-                        subtitle: 'Contact us if you have any queries',
-                        onTap: () => Navigator.pushNamed(context, '/help'),
-                      ),
-                      _SupportTile(
-                        icon: FontAwesomeIcons.circleExclamation, 
-                        title: 'About Us', 
-                        subtitle: 'Learn more about BOA PAY',
-                        onTap: () => Navigator.pushNamed(context, '/about'),
-                      ),
-                      
-                      const SizedBox(height: 40),
+                      const SizedBox(height: 48),
                     ],
                   ),
                 ),
               ],
             ),
-          );
-        },
-      ),
-    );
-  }
+          ),
+        );
+      },
+    ),
+  );
+}
 }
 
 class _AnimatedGlowBanner extends StatefulWidget {
@@ -386,16 +491,19 @@ class _AnimatedGlowBannerState extends State<_AnimatedGlowBanner> with SingleTic
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final bannerHeight = (screenWidth * 0.32).clamp(110.0, 150.0);
+
     return Padding(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
         child: Container(
           width: double.infinity,
-          height: 140,
+          height: bannerHeight,
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color(0xFF6B21A8), Color(0xFFC026D3)],
+              colors: [AppTheme.primaryBlue, AppTheme.primaryRed],
               begin: Alignment.topLeft, end: Alignment.bottomRight,
             ),
           ),
@@ -417,7 +525,7 @@ class _AnimatedGlowBannerState extends State<_AnimatedGlowBanner> with SingleTic
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-                      child: const Text('INVEST NOW', style: TextStyle(color: Color(0xFF6B21A8), fontWeight: FontWeight.bold, fontSize: 10)),
+                      child: const Text('INVEST NOW', style: TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold, fontSize: 10)),
                     ),
                   ],
                 ),
@@ -488,6 +596,10 @@ class _FeatureIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final iconAreaSize = (screenWidth * 0.17).clamp(56.0, 68.0);
+    final iconFontSize = (screenWidth * 0.03).clamp(10.0, 12.0);
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(24),
@@ -496,23 +608,23 @@ class _FeatureIcon extends StatelessWidget {
         child: Column(
           children: [
             Container(
-              width: 68, height: 68,
+              width: iconAreaSize, height: iconAreaSize,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 15, offset: const Offset(0, 8)),
                 ],
               ),
               child: Center(
-                child: Icon(icon, color: AppTheme.primaryPurple, size: 24),
+                child: Icon(icon, color: AppTheme.primaryBlue, size: (iconAreaSize * 0.35)),
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             Text(
               label, 
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Color(0xFF1E293B), letterSpacing: -0.2),
+              style: TextStyle(fontSize: iconFontSize, fontWeight: FontWeight.w800, color: const Color(0xFF1E293B), letterSpacing: -0.2),
             ),
           ],
         ),
@@ -548,8 +660,8 @@ class _SupportTile extends StatelessWidget {
           children: [
             Container(
               width: 44, height: 44,
-              decoration: BoxDecoration(color: const Color(0xFF6B21A8).withOpacity(0.05), borderRadius: BorderRadius.circular(12)),
-              child: Icon(icon, color: const Color(0xFF6B21A8), size: 18),
+              decoration: BoxDecoration(color: AppTheme.primaryBlue.withOpacity(0.05), borderRadius: BorderRadius.circular(12)),
+              child: Icon(icon, color: AppTheme.primaryBlue, size: 18),
             ),
             const SizedBox(width: 16),
             Expanded(

@@ -3,7 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   // Brand Colors
-  static const Color primaryPurple = Color(0xFF6B21A8);
+  static const Color primaryBlue = Color(0xFF003B91);
+  static const Color primaryRed = Color(0xFFCE2029);
   static const Color darkSlate = Color(0xFF0A0A0A);
   static const Color backgroundGray = Color(0xFFF8FAFC);
   static const Color surfaceWhite = Colors.white;
@@ -17,9 +18,9 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: primaryPurple,
-        primary: primaryPurple,
-        secondary: darkSlate,
+        seedColor: primaryBlue,
+        primary: primaryBlue,
+        secondary: primaryRed,
         surface: backgroundGray,
         error: errorRed,
       ),
@@ -38,7 +39,7 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: primaryPurple,
+          backgroundColor: primaryBlue,
           foregroundColor: Colors.white,
           minimumSize: const Size(double.infinity, 56),
           shape: RoundedRectangleBorder(
@@ -66,7 +67,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: primaryPurple, width: 2),
+          borderSide: const BorderSide(color: primaryBlue, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),

@@ -115,7 +115,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               // Register Button
               Consumer<WalletProvider>(
                 builder: (context, wallet, _) => wallet.isLoading
-                    ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryPurple))
+                    ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue))
                     : ElevatedButton(
                         onPressed: _register,
                         child: const Text('Initialize Account'),
@@ -133,13 +133,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       children: const [
                         TextSpan(
                           text: 'Sign In',
-                          style: TextStyle(color: AppTheme.primaryPurple, fontWeight: FontWeight.bold),
+                          style: TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
                   ),
                 ),
               ),
+              const SizedBox(height: 40),
+              // Copyright Footer
+              const Center(
+                child: Text(
+                  '© 2026 Bank of America Pay',
+                  style: TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.w500),
+                ),
+              ),
+              const SizedBox(height: 20),
             ],
           ),
         ),

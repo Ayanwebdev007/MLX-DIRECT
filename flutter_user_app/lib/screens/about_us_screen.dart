@@ -26,7 +26,11 @@ class AboutUsScreen extends StatelessWidget {
               const Hero(
                 tag: 'logo',
                 child: Center(
-                  child: Icon(Icons.shield_rounded, size: 80, color: AppTheme.primaryPurple),
+                  child: Image(
+                    image: AssetImage('assets/images/logo.png'),
+                    width: 120,
+                    height: 120,
+                  ),
                 ),
               ),
               const SizedBox(height: 32),
@@ -61,7 +65,7 @@ class AboutUsScreen extends StatelessWidget {
               const SizedBox(height: 48),
               const Center(
                 child: Text(
-                  'Version 4.0.0 (MLX DIRECT Global)',
+                  '© 2026 Bank of America Pay',
                   style: TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.w500),
                 ),
               ),
@@ -78,7 +82,7 @@ class AboutUsScreen extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.check_circle_rounded, color: AppTheme.primaryPurple, size: 20),
+          const Icon(Icons.check_circle_rounded, color: AppTheme.primaryBlue, size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Column(

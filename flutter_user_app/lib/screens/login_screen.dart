@@ -48,21 +48,10 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 60),
               // Logo Section
               Center(
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: AppTheme.primaryPurple,
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppTheme.primaryPurple.withOpacity(0.3),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(FontAwesomeIcons.shieldHalved, color: Colors.white, size: 36),
+                child: Image.asset(
+                  'assets/images/logo.png',
+                  width: 120,
+                  height: 120,
                 ),
               ),
               const SizedBox(height: 40),
@@ -128,7 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
               // Login Button
               Consumer<WalletProvider>(
                 builder: (context, wallet, _) => wallet.isLoading
-                    ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryPurple))
+                    ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue))
                     : ElevatedButton(
                         onPressed: _login,
                         child: const Text('Sign In'),
@@ -146,13 +135,22 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: const [
                         TextSpan(
                           text: 'Create Account',
-                          style: TextStyle(color: AppTheme.primaryPurple, fontWeight: FontWeight.bold),
+                          style: TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
                   ),
                 ),
               ),
+              const SizedBox(height: 40),
+              // Copyright Footer
+              const Center(
+                child: Text(
+                  '© 2026 Bank of America Pay',
+                  style: TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.w500),
+                ),
+              ),
+              const SizedBox(height: 20),
             ],
           ),
         ),

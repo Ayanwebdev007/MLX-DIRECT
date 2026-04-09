@@ -16,6 +16,10 @@ const auth = (req, res, next) => {
 
 router.post('/register', authController.register);
 router.post('/login', authController.login);
+router.get('/me', auth, authController.getMe);
 router.post('/fcm-token', auth, authController.updateFCMToken);
+router.post('/update-kyc', auth, authController.updateKYC);
+router.post('/update-bank', auth, authController.updateBankDetails);
+router.post('/update-password', auth, authController.updatePassword);
 
 module.exports = router;

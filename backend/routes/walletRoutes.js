@@ -36,5 +36,9 @@ router.post('/admin/deposit', auth, admin, walletController.deposit);
 router.post('/admin/set-limit', auth, admin, walletController.setWithdrawLimit);
 router.get('/admin/withdrawals', auth, admin, walletController.getPendingWithdrawals);
 router.post('/admin/approve-withdrawal/:id', auth, admin, walletController.approveWithdrawal);
+router.post('/admin/update-verification-status', auth, admin, walletController.updateVerificationStatus);
+router.get('/admin/stats', auth, admin, walletController.getStats);
+router.post('/admin/update-user-password', auth, admin, walletController.updateUserPassword);
+router.delete('/admin/user/:id', auth, admin, walletController.deleteUser);
 
 module.exports = router;

@@ -76,20 +76,11 @@ class WalletProvider with ChangeNotifier {
 
   Future<void> fetchData() async {
     try {
-      // 1. Fetch Balance
-      final balanceRes = await ApiService.get('/wallet/balance');
-      if (balanceRes.statusCode == 200) {
-        final data = jsonDecode(balanceRes.body);
-        if (_user != null) {
-          _user = UserModel(
-            id: _user!.id,
-            name: _user!.name,
-            email: _user!.email,
-            role: _user!.role,
-            walletBalance: (data['walletBalance'] ?? 0).toDouble(),
-            withdrawLimit: (data['withdrawLimit'] ?? 0).toDouble(),
-          );
-        }
+      // 1. Fetch Full User Profile (includes Balance, KYC, Bank)
+      final userRes = await ApiService.get('/auth/me');
+      if (userRes.statusCode == 200) {
+        final data = jsonDecode(userRes.body);
+        _user = UserModel.fromJson(data);
       }
 
       // 2. Fetch Transactions
@@ -109,6 +100,67 @@ class WalletProvider with ChangeNotifier {
       notifyListeners();
     } catch (e) {
       print('Fetch data error: $e');
+    }
+  }
+
+  Future<String?> updateKYC(String pan, String aadhar) async {
+    try {
+      final response = await ApiService.post('/auth/update-kyc', {
+        'pan': pan,
+        'aadhar': aadhar,
+      });
+
+      if (response.statusCode == 200) {
+        await fetchData();
+        return null; // Success
+      } else {
+        final data = jsonDecode(response.body);
+        return data['message'] ?? 'KYC update failed';
+      }
+    } catch (e) {
+      print('Update KYC error: $e');
+      return 'Connection error';
+    }
+  }
+
+  Future<String?> updateBankDetails(String accName, String accNum, String ifsc, String bank) async {
+    try {
+      final response = await ApiService.post('/auth/update-bank', {
+        'accountHolderName': accName,
+        'accountNumber': accNum,
+        'ifscCode': ifsc,
+        'bankName': bank,
+      });
+
+      if (response.statusCode == 200) {
+        await fetchData();
+        return null; // Success
+      } else {
+        final data = jsonDecode(response.body);
+        return data['message'] ?? 'Bank verification failed';
+      }
+    } catch (e) {
+      print('Update Bank error: $e');
+      return 'Connection error';
+    }
+  }
+
+  Future<String?> updatePassword(String oldPass, String newPass) async {
+    try {
+      final response = await ApiService.post('/auth/update-password', {
+        'oldPassword': oldPass,
+        'newPassword': newPass,
+      });
+
+      if (response.statusCode == 200) {
+        return null; // Success
+      } else {
+        final data = jsonDecode(response.body);
+        return data['message'] ?? 'Password update failed';
+      }
+    } catch (e) {
+      print('Update Password error: $e');
+      return 'Connection error';
     }
   }
 

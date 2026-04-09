@@ -6,6 +6,9 @@ class UserModel {
   final double walletBalance;
   final double withdrawLimit;
 
+  final Map<String, dynamic> kyc;
+  final Map<String, dynamic> bankDetails;
+
   UserModel({
     required this.id,
     required this.name,
@@ -13,6 +16,8 @@ class UserModel {
     required this.role,
     required this.walletBalance,
     required this.withdrawLimit,
+    this.kyc = const {},
+    this.bankDetails = const {},
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -23,6 +28,8 @@ class UserModel {
       role: json['role'] ?? 'user',
       walletBalance: (json['walletBalance'] ?? 0).toDouble(),
       withdrawLimit: (json['withdrawLimit'] ?? 0).toDouble(),
+      kyc: json['kyc'] ?? {},
+      bankDetails: json['bankDetails'] ?? {},
     );
   }
 }

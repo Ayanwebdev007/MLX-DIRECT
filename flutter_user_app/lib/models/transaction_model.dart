@@ -6,6 +6,9 @@ class TransactionModel {
   final DateTime createdAt;
   final String? description;
 
+  final String? payoutId;
+  final String? payoutStatus;
+
   TransactionModel({
     required this.id,
     required this.amount,
@@ -13,6 +16,8 @@ class TransactionModel {
     required this.status,
     required this.createdAt,
     this.description,
+    this.payoutId,
+    this.payoutStatus,
   });
 
   factory TransactionModel.fromJson(Map<String, dynamic> json) {
@@ -23,6 +28,8 @@ class TransactionModel {
       status: json['status'] ?? 'pending',
       createdAt: DateTime.parse(json['createdAt']),
       description: json['description'],
+      payoutId: json['payoutId'],
+      payoutStatus: json['payoutStatus'],
     );
   }
 }

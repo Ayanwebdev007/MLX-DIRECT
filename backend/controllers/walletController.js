@@ -132,12 +132,15 @@ exports.setWithdrawLimit = async (req, res) => {
 
 exports.getPendingWithdrawals = async (req, res) => {
   try {
-    const withdrawals = await Transaction.find({ type: 'withdrawal', status: 'pending' }).populate('userId', 'name email');
+    const withdrawals = await Transaction.find({ type: 'withdrawal', status: 'pending' })
+      .populate('userId', 'name email walletBalance bankDetails kyc');
     res.json(withdrawals);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching pending withdrawals', error: error.message });
   }
 };
+
+const razorpayService = require('../services/razorpayService');
 
 exports.approveWithdrawal = async (req, res) => {
   try {
@@ -147,11 +150,30 @@ exports.approveWithdrawal = async (req, res) => {
     if (!transaction) return res.status(404).json({ message: 'Transaction not found' });
     if (transaction.status !== 'pending') return res.status(400).json({ message: 'Transaction already processed' });
 
+    const user = await User.findById(transaction.userId);
+
     if (status === 'approved') {
-      const user = await User.findById(transaction.userId);
+      // Security Check: User must have verified bank details
+      if (!user.bankDetails || !user.bankDetails.verified) {
+        return res.status(400).json({ message: 'User bank account not verified' });
+      }
+
       if (user.walletBalance < transaction.amount) {
         return res.status(400).json({ message: 'User has insufficient balance now' });
       }
+
+      // Trigger Razorpay Payout (with gracefull fallback if API is not yet active)
+      try {
+        const payout = await razorpayService.triggerPayout(user.bankDetails, transaction.amount);
+        transaction.payoutId = payout.id;
+        transaction.payoutStatus = payout.status;
+      } catch (payoutError) {
+        console.error('[RAZORPAY API FAILED - FALLBACK TO MANUAL]', payoutError.message);
+        transaction.payoutStatus = 'pending'; // Mark as pending disbursement in Razorpay terms
+        transaction.description = `Automated payout failed: ${payoutError.message}. Manual processing required.`;
+        // We DO NOT return 500 here anymore, so the status update below still happens.
+      }
+
       user.walletBalance = Number((user.walletBalance - transaction.amount).toFixed(2));
       await user.save();
     }
@@ -171,10 +193,9 @@ exports.approveWithdrawal = async (req, res) => {
     await notification.save();
 
     // Send Push Notification
-    const recipient = await User.findById(transaction.userId);
-    if (recipient && recipient.fcmToken) {
+    if (user && user.fcmToken) {
       await sendPushNotification(
-        recipient.fcmToken,
+        user.fcmToken,
         status === 'approved' ? 'Withdrawal Approved' : 'Withdrawal Rejected',
         status === 'approved' 
           ? `Your withdrawal request for ₹${transaction.amount} has been processed.` 
@@ -182,8 +203,196 @@ exports.approveWithdrawal = async (req, res) => {
       );
     }
 
-    res.json({ message: `Transaction ${status}`, transaction });
+    res.json({ 
+      message: `Transaction ${status}`, 
+      transaction,
+      payoutId: transaction.payoutId 
+    });
   } catch (error) {
     res.status(500).json({ message: 'Transaction processing failed', error: error.message });
+  }
+};
+
+exports.updateVerificationStatus = async (req, res) => {
+  try {
+    const { userId, status, type } = req.body; // type: 'kyc' or 'bank'
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (type === 'kyc') {
+      if (user.kyc.status === status) return res.status(400).json({ message: `KYC status already set to ${status}` });
+      user.kyc.status = status;
+    } else if (type === 'bank') {
+      const verified = (status === 'approved');
+      if (user.bankDetails.verified === verified) return res.status(400).json({ message: `Bank verification already set to ${verified}` });
+      user.bankDetails.verified = verified;
+    } else {
+      return res.status(400).json({ message: 'Invalid verification type' });
+    }
+
+    await user.save();
+
+    const title = type === 'kyc' 
+      ? (status === 'approved' ? 'KYC Approved' : 'KYC Rejected')
+      : (status === 'approved' ? 'Bank Verified' : 'Bank Verification Failed');
+    
+    const message = type === 'kyc'
+      ? (status === 'approved' ? 'Congratulations! Your identity has been verified.' : 'Your KYC was not approved. Please check details.')
+      : (status === 'approved' ? 'Your bank account has been successfully verified for withdrawals.' : 'Bank verification failed. Please check your details.');
+
+    // Create Notification
+    const notification = new Notification({
+      userId,
+      title,
+      message,
+      type: status === 'approved' ? 'success' : 'error'
+    });
+    await notification.save();
+
+    // Send Push Notification
+    if (user.fcmToken) {
+      await sendPushNotification(user.fcmToken, title, message);
+    }
+
+    res.json({ message: `${type} ${status}`, user });
+  } catch (error) {
+    res.status(500).json({ message: 'Verification update failed', error: error.message });
+  }
+};
+exports.getStats = async (req, res) => {
+  try {
+    const totalUsers = await User.countDocuments({ role: 'user' });
+    const pendingWithdrawals = await Transaction.countDocuments({ type: 'withdrawal', status: 'pending' });
+    const totalWithdrawals = await Transaction.countDocuments({ type: 'withdrawal', status: 'approved' });
+
+    // Calculate global liquidity (sum of all user balances)
+    const users = await User.find({ role: 'user' }).select('walletBalance');
+    const globalLiquidity = users.reduce((sum, u) => sum + (u.walletBalance || 0), 0);
+
+    // REAL TRANSACTION ANALYTICS: Last 7 Days aggregation
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setHours(0, 0, 0, 0);
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6); 
+
+    console.log(`[Stats API] Aggregating from: ${sevenDaysAgo.toISOString()}`);
+
+    const rawVolume = await Transaction.aggregate([
+      { 
+        $match: { 
+          createdAt: { $gte: sevenDaysAgo },
+          status: { $ne: 'rejected' } 
+        } 
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          amount: { $sum: "$amount" }
+        }
+      },
+      { $sort: { "_id": 1 } }
+    ]);
+
+    console.log(`[Stats API] Raw Aggregation Count: ${rawVolume.length}`);
+
+    // Pad missing days with zeros to ensure a consistent 7-day chart
+    const volumeHistory = [];
+    for (let i = 0; i < 7; i++) {
+        const d = new Date(sevenDaysAgo);
+        d.setDate(sevenDaysAgo.getDate() + i);
+        const dateStr = d.toISOString().split('T')[0];
+        
+        // Find match using startsWith to handle any slight string variations
+        const match = rawVolume.find(v => v._id === dateStr);
+        const amount = match ? match.amount : 0;
+        
+        volumeHistory.push({
+            date: dateStr,
+            amount: amount,
+            day: d.toLocaleDateString(undefined, { weekday: 'short' }) // Include weekday string from backend
+        });
+    }
+
+    console.log(`[Stats API] Final volumeHistory days: ${volumeHistory.length}`);
+
+    // Get recent activity (last 8 transactions)
+    const recentActivity = await Transaction.find().sort({ createdAt: -1 }).limit(8).populate('userId', 'name');
+
+    res.json({
+      totalUsers,
+      pendingWithdrawals,
+      totalWithdrawals,
+      globalLiquidity,
+      recentActivity,
+      volumeHistory
+    });
+  } catch (error) {
+    console.error('[Stats API Error]', error);
+    res.status(500).json({ message: 'Error fetching stats', error: error.message });
+  }
+};
+
+exports.updateUserPassword = async (req, res) => {
+  try {
+    const { userId, newPassword } = req.body;
+    
+    if (!newPassword || newPassword.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters' });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    user.password = newPassword;
+    await user.save(); // Triggers pre-save hashing
+
+    // Create Notification
+    const notification = new Notification({
+      userId,
+      title: 'Security Alert',
+      message: 'Your account password has been updated by an admin. Please use the new credentials for your next login.',
+      type: 'security'
+    });
+    await notification.save();
+
+    // Send Push Notification with specialized data payload
+    if (user.fcmToken) {
+      await sendPushNotification(
+        user.fcmToken,
+        'Security Alert',
+        'Your password has been updated.',
+        { type: 'password_change' }
+      );
+    }
+
+    res.json({ message: 'User password updated successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to update user password', error: error.message });
+  }
+};
+
+exports.deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Safety check: Don't allow admins to delete themselves via this endpoint (usually handled by auth)
+    if (req.user.id === id) {
+      return res.status(400).json({ message: 'You cannot delete your own admin account.' });
+    }
+
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    // 1. Delete all transactions associated with the user
+    await Transaction.deleteMany({ userId: id });
+
+    // 2. Delete all notifications associated with the user
+    await Notification.deleteMany({ userId: id });
+
+    // 3. Delete the user document
+    await User.findByIdAndDelete(id);
+
+    res.json({ message: 'User and all associated data deleted permanently.' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to delete user', error: error.message });
   }
 };

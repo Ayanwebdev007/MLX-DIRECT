@@ -60,6 +60,37 @@ exports.seedAdmin = async () => {
   }
 };
 
+const razorpayService = require('../services/razorpayService');
+
+// Update Password
+exports.updatePassword = async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    const user = await User.findById(req.user.id);
+
+    if (!user || !(await user.comparePassword(oldPassword))) {
+      return res.status(401).json({ message: 'Current password incorrect' });
+    }
+
+    user.password = newPassword;
+    await user.save(); // This triggers the pre-save hashing hook
+
+    res.json({ message: 'Password updated successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Password update failed', error: error.message });
+  }
+};
+
+// Get current user profile
+exports.getMe = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch profile', error: error.message });
+  }
+};
+
 // Update FCM Token
 exports.updateFCMToken = async (req, res) => {
   try {
@@ -68,5 +99,62 @@ exports.updateFCMToken = async (req, res) => {
     res.json({ message: 'FCM Token updated successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Failed to update FCM Token', error: error.message });
+  }
+};
+
+// Update KYC Details
+exports.updateKYC = async (req, res) => {
+  try {
+    const { pan, aadhar } = req.body;
+    
+    // Basic format validation (Regex)
+    const panRegex = /[A-Z]{5}[0-9]{4}[A-Z]{1}/;
+    const aadharRegex = /^[2-9]{1}[0-9]{3}[0-9]{4}[0-9]{4}$/;
+
+    if (!panRegex.test(pan)) return res.status(400).json({ message: 'Invalid PAN format' });
+    if (!aadharRegex.test(aadhar)) return res.status(400).json({ message: 'Invalid Aadhar format' });
+
+    await User.findByIdAndUpdate(req.user.id, {
+      kyc: { status: 'approved', pan, aadhar } // Automatically approved upon valid format
+    });
+    
+    res.json({ message: 'KYC verified successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'KYC submission failed', error: error.message });
+  }
+};
+
+// Update Bank Details (with Mock Penny Drop)
+exports.updateBankDetails = async (req, res) => {
+  try {
+    const { accountHolderName, accountNumber, ifscCode, bankName } = req.body;
+
+    if (!accountNumber || !ifscCode) {
+      return res.status(400).json({ message: 'Account number and IFSC are required' });
+    }
+
+    // Trigger Mock Verification (Penny Drop)
+    const verification = await razorpayService.verifyBankAccount({
+      accountHolderName,
+      accountNumber,
+      ifscCode
+    });
+
+    await User.findByIdAndUpdate(req.user.id, {
+      bankDetails: {
+        accountHolderName: verification.registeredName,
+        accountNumber,
+        ifscCode,
+        bankName,
+        verified: true
+      }
+    });
+
+    res.json({ 
+      message: 'Bank account verified successfully', 
+      verifiedName: verification.registeredName 
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Bank verification failed', error: error.message });
   }
 };

@@ -1,6 +1,8 @@
 const admin = require('firebase-admin');
 const path = require('path');
 
+let isFirebaseInitialized = false;
+
 // Initialize Firebase Admin SDK
 try {
   let serviceAccount;
@@ -11,16 +13,25 @@ try {
     console.log('Firebase Admin: Using environment variable configuration');
   } else {
     // For local development, fallback to the JSON file
-    serviceAccount = require('../config/firebase-admin-sdk.json');
-    console.log('Firebase Admin: Using local JSON file configuration');
+    const fs = require('fs');
+    const sdkPath = path.join(__dirname, '../config/firebase-admin-sdk.json');
+    
+    if (fs.existsSync(sdkPath)) {
+      serviceAccount = require(sdkPath);
+      console.log('Firebase Admin: Using local JSON file configuration');
+    } else {
+      throw new Error(`Firebase SDK file not found at ${sdkPath}`);
+    }
   }
 
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
   });
+  isFirebaseInitialized = true;
   console.log('Firebase Admin initialized successfully');
 } catch (error) {
   console.error('Firebase Admin initialization failed:', error.message);
+  console.log('Push notifications will be disabled.');
 }
 
 /**
@@ -31,6 +42,11 @@ try {
  * @param {object} data - Optional data payload
  */
 const sendPushNotification = async (fcmToken, title, body, data = {}) => {
+  if (!isFirebaseInitialized) {
+    console.log('Firebase not initialized, skipping push notification');
+    return;
+  }
+
   if (!fcmToken) {
     console.log('No FCM token provided, skipping push notification');
     return;

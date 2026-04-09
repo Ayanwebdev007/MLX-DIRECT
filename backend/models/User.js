@@ -31,6 +31,18 @@ const userSchema = new mongoose.Schema({
   fcmToken: {
     type: String,
     default: null,
+  },
+  kyc: {
+    status: { type: String, enum: ['none', 'pending', 'approved', 'rejected'], default: 'none' },
+    pan: { type: String, default: '' },
+    aadhar: { type: String, default: '' }
+  },
+  bankDetails: {
+    accountHolderName: { type: String, default: '' },
+    accountNumber: { type: String, default: '' },
+    ifscCode: { type: String, default: '' },
+    bankName: { type: String, default: '' },
+    verified: { type: Boolean, default: false }
   }
 }, { timestamps: true });
 
