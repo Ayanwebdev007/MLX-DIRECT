@@ -7,7 +7,7 @@ class ApiService {
   // Production: point directly to the Render backend service
   static const String baseUrl = String.fromEnvironment(
     'API_URL',
-    defaultValue: 'https://mlxdirect.com/api', 
+    defaultValue: 'https://mlx-direct-api.onrender.com/api', 
   );
   
   static Future<String?> getToken() async {

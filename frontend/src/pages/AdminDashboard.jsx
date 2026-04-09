@@ -29,7 +29,7 @@ const AdminDashboard = () => {
   const BRAND_BLUE = '#003B91';
   const BRAND_RED = '#CE2029';
 
-  const API_BASE_URL = 'http://localhost:5000/api';
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://mlx-direct-api.onrender.com/api';
   const token = localStorage.getItem('token');
   const headers = { Authorization: `Bearer ${token}` };
 
