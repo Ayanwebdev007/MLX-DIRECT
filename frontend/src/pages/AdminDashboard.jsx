@@ -908,7 +908,6 @@ const AdminDashboard = () => {
                       <div className="max-w-4xl mx-auto space-y-8">
                         <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-tight">{selectedMessage.subject || 'Administrative Inquiry'}</h2>
                         <div className="flex items-center justify-between border-b border-slate-100 pb-6">
-                        <div className="flex items-center justify-between border-b border-slate-100 pb-6">
                            <div className="flex items-center space-x-4">
                               <div style={{ backgroundColor: BRAND_BLUE }} className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black">
                                 {selectedMessage.direction === 'received' ? (selectedMessage.senderName ? selectedMessage.senderName[0] : (selectedMessage.from ? selectedMessage.from[0] : 'R')) : (selectedMessage.to ? selectedMessage.to[0] : 'S')}
@@ -990,7 +989,7 @@ const AdminDashboard = () => {
                            <p className="text-[11px] font-black uppercase tracking-[0.2em] italic tracking-widest">No mail records in {mailFolder}</p>
                         </div>
                       )}
-                    </div>              </div>
+                    </div>
                   </div>
                 )}
               </div>
