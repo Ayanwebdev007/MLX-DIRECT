@@ -102,17 +102,17 @@ exports.handleInboundWebhook = async (req, res) => {
       return res.status(200).json({ message: 'Ignore: No email_id found' });
     }
 
-    // Fetch the full email content using the ID
-    console.log(`[INBOUND] Fetching content for email_id: ${email_id}`);
+    // Fetch the full email content using the correct Receiving API
+    console.log(`[INBOUND] Fetching content for inbound email_id: ${email_id}`);
     const resend = new Resend(process.env.RESEND_API_KEY);
-    const fullEmail = await resend.emails.get(email_id);
+    const { data: fullEmail, error: fetchError } = await resend.emails.receiving.get(email_id);
     
-    if (!fullEmail || fullEmail.error) {
-      console.error('[INBOUND ERROR] Failed to fetch email content:', fullEmail.error);
+    if (fetchError) {
+      console.error('[INBOUND ERROR] Failed to fetch email content:', fetchError);
       return res.status(200).json({ message: 'Fetch failed' });
     }
 
-    const { text, html } = fullEmail.data || fullEmail; // Resend SDK returns data nested in some versions
+    const { text, html } = fullEmail;
 
     // Helper to extract email and name from "Name <email@address.com>"
     const parseAddress = (addr) => {
