@@ -95,13 +95,24 @@ exports.handleInboundWebhook = async (req, res) => {
       return res.status(200).json({ message: `Ignored event: ${payload.type}` });
     }
 
-    // Resend Inbound Webhook structure
-    const data = payload.data;
-    const { from, to, subject, text, html } = data;
+    // Resend Inbound Webhook structure (metadata only)
+    const { email_id, from, to, subject } = payload.data;
     
-    if (!from || !to) {
-      return res.status(200).json({ message: 'Ignore: Incomplete email data' });
+    if (!email_id) {
+      return res.status(200).json({ message: 'Ignore: No email_id found' });
     }
+
+    // Fetch the full email content using the ID
+    console.log(`[INBOUND] Fetching content for email_id: ${email_id}`);
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    const fullEmail = await resend.emails.get(email_id);
+    
+    if (!fullEmail || fullEmail.error) {
+      console.error('[INBOUND ERROR] Failed to fetch email content:', fullEmail.error);
+      return res.status(200).json({ message: 'Fetch failed' });
+    }
+
+    const { text, html } = fullEmail.data || fullEmail; // Resend SDK returns data nested in some versions
 
     // Helper to extract email and name from "Name <email@address.com>"
     const parseAddress = (addr) => {
@@ -119,13 +130,13 @@ exports.handleInboundWebhook = async (req, res) => {
       from: fromParsed.email,
       senderName: fromParsed.name,
       to: toParsed.email,
-      subject: subject || '(No Subject)',
+      subject: subject || fullEmail.subject || '(No Subject)',
       message: text || '(No Text Content)',
       html: html || null,
       direction: 'received'
     });
 
-    console.log(`[INBOUND SUCCESS] Saved email from ${fromParsed.email} | ID: ${newInbound._id}`);
+    console.log(`[INBOUND SUCCESS] Content retrieved and saved | ID: ${newInbound._id}`);
     res.status(200).json({ success: true, id: newInbound._id });
   } catch (error) {
     console.error('[WEBHOOK CRITICAL ERROR]', error);
