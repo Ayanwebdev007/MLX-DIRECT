@@ -85,64 +85,8 @@ exports.sendEmail = async (req, res) => {
   }
 };
 
-exports.handleInboundWebhook = async (req, res) => {
-  try {
-    const payload = req.body;
-    console.log('[WEBHOOK] Received event type:', payload.type);
-    
-    // ONLY process actual incoming emails
-    if (payload.type !== 'email.received') {
-      return res.status(200).json({ message: `Ignored event: ${payload.type}` });
-    }
+// End of Controller
 
-    // Resend Inbound Webhook structure (metadata only)
-    const { email_id, from, to, subject } = payload.data;
-    
-    if (!email_id) {
-      return res.status(200).json({ message: 'Ignore: No email_id found' });
-    }
-
-    // Fetch the full email content using the correct Receiving API
-    console.log(`[INBOUND] Fetching content for inbound email_id: ${email_id}`);
-    const resend = new Resend(process.env.RESEND_API_KEY);
-    const { data: fullEmail, error: fetchError } = await resend.emails.receiving.get(email_id);
-    
-    if (fetchError) {
-      console.error('[INBOUND ERROR] Failed to fetch email content:', fetchError);
-      return res.status(200).json({ message: 'Fetch failed' });
-    }
-
-    const { text, html } = fullEmail;
-
-    // Helper to extract email and name from "Name <email@address.com>"
-    const parseAddress = (addr) => {
-      if (typeof addr === 'object' && addr.email) return { email: addr.email, name: addr.name };
-      const match = String(addr).match(/(.*)<(.+@.+)>/);
-      if (match) return { name: match[1].trim(), email: match[2].trim() };
-      return { name: null, email: String(addr).trim() };
-    };
-
-    const fromParsed = parseAddress(from);
-    const toRaw = Array.isArray(to) ? to[0] : to;
-    const toParsed = parseAddress(toRaw);
-
-    const newInbound = await SentEmail.create({
-      from: fromParsed.email,
-      senderName: fromParsed.name,
-      to: toParsed.email,
-      subject: subject || fullEmail.subject || '(No Subject)',
-      message: text || '(No Text Content)',
-      html: html || null,
-      direction: 'received'
-    });
-
-    console.log(`[INBOUND SUCCESS] Content retrieved and saved | ID: ${newInbound._id}`);
-    res.status(200).json({ success: true, id: newInbound._id });
-  } catch (error) {
-    console.error('[WEBHOOK CRITICAL ERROR]', error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-};
 
 /**
  * Fetch sent email history
@@ -155,4 +99,3 @@ exports.getSentEmails = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
-

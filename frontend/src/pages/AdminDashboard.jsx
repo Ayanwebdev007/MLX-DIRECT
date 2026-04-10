@@ -31,7 +31,7 @@ const AdminDashboard = () => {
   const [emailData, setEmailData] = useState({ to: '', subject: '', message: '' });
   const [emailFile, setEmailFile] = useState(null);
   const [sentEmails, setSentEmails] = useState([]);
-  const [mailFolder, setMailFolder] = useState('inbox');
+  const [mailFolder, setMailFolder] = useState('sent');
   const [isComposing, setIsComposing] = useState(false);
   const fileInputRef = useRef(null);
   const mailInputRef = useRef(null);
@@ -794,8 +794,7 @@ const AdminDashboard = () => {
 
                 <nav className="space-y-2">
                   {[
-                    { id: 'inbox', label: 'Inbox', icon: <FaInbox />, count: sentEmails.filter(e => e.direction === 'received').length },
-                    { id: 'sent', label: 'Sent History', icon: <FaPaperPlane />, count: sentEmails.filter(e => e.direction === 'sent').length }
+                    { id: 'sent', label: 'Sent History', icon: <FaPaperPlane />, count: sentEmails.length }
                   ].map(folder => (
                     <button
                       key={folder.id}
@@ -951,8 +950,8 @@ const AdminDashboard = () => {
                   /* Mail Grid List */
                   <div className="flex-1 overflow-y-auto bg-slate-50/10">
                     <div className="divide-y divide-slate-50">
-                      {(mailFolder === 'inbox' ? sentEmails.filter(e => e.direction === 'received') : sentEmails.filter(e => e.direction === 'sent')).length > 0 ? 
-                       (mailFolder === 'inbox' ? sentEmails.filter(e => e.direction === 'received') : sentEmails.filter(e => e.direction === 'sent')).map((msg) => (
+                      {sentEmails.length > 0 ? 
+                       sentEmails.map((msg) => (
                         <div 
                           key={msg._id} 
                           onClick={() => { setSelectedMessage(msg); }}
@@ -960,17 +959,14 @@ const AdminDashboard = () => {
                         >
                           <div className="flex items-center space-x-6 flex-1 overflow-hidden">
                              <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 text-xs font-black uppercase group-hover:bg-white group-hover:text-[#003B91] transition-all">
-                                {msg.senderName ? msg.senderName[0] : (msg.from ? msg.from[0] : (msg.to ? msg.to[0] : 'U'))}
+                                {msg.to ? msg.to[0] : 'S'}
                              </div>
                              <div className="flex-1 overflow-hidden pr-10">
                                 <div className="flex items-center space-x-2">
                                    <p className={`text-sm truncate leading-none font-black text-slate-900`}>
-                                      {mailFolder === 'inbox' ? (msg.senderName || msg.from) : (msg.to)}
+                                      To: {msg.to}
                                    </p>
                                    {msg.attachmentName && <span className="text-[10px] text-[#003B91] opacity-40"><FaCloudUploadAlt size={12} /></span>}
-                                   <span className={`text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded border ${msg.direction === 'received' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-blue-50 text-blue-600 border-blue-100'}`}>
-                                      {msg.direction}
-                                   </span>
                                 </div>
                                 <p className={`text-[12px] truncate mt-1.5 font-bold text-slate-400`}>
                                    <span className="font-extrabold text-slate-600">{msg.subject || 'No Subject'}</span>
@@ -986,7 +982,7 @@ const AdminDashboard = () => {
                       )) : (
                         <div className="h-[500px] flex flex-col items-center justify-center text-slate-300 space-y-3 opacity-50">
                            <FaEnvelope size={48} />
-                           <p className="text-[11px] font-black uppercase tracking-[0.2em] italic tracking-widest">No mail records in {mailFolder}</p>
+                           <p className="text-[11px] font-black uppercase tracking-[0.2em] italic tracking-widest">No sent mail records found</p>
                         </div>
                       )}
                     </div>
