@@ -21,7 +21,4 @@ router.post('/send-email', auth, admin, upload.single('attachment'), adminContro
 // GET /api/admin/sent-emails
 router.get('/sent-emails', auth, admin, adminController.getSentEmails);
 
-// Webhook for Inbound Emails (Public, used by Resend)
-router.post('/webhook/inbound', adminController.handleInboundWebhook);
-
 module.exports = router;
