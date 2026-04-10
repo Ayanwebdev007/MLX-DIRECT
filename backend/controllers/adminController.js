@@ -88,14 +88,19 @@ exports.sendEmail = async (req, res) => {
 exports.handleInboundWebhook = async (req, res) => {
   try {
     const payload = req.body;
-    console.log('[WEBHOOK] Received payload:', JSON.stringify(payload, null, 2));
+    console.log('[WEBHOOK] Received event type:', payload.type);
     
+    // ONLY process actual incoming emails
+    if (payload.type !== 'email.received') {
+      return res.status(200).json({ message: `Ignored event: ${payload.type}` });
+    }
+
     // Resend Inbound Webhook structure
-    const data = payload.data || payload; // Support both nested data and top-level
+    const data = payload.data;
     const { from, to, subject, text, html } = data;
     
     if (!from || !to) {
-      return res.status(200).json({ message: 'Ignore: Non-email payload' });
+      return res.status(200).json({ message: 'Ignore: Incomplete email data' });
     }
 
     // Helper to extract email and name from "Name <email@address.com>"
