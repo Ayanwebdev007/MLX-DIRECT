@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { FaPhoneAlt, FaEnvelope, FaMapMarkerAlt, FaGlobe, FaClock } from 'react-icons/fa';
+import MapSection from '../components/MapSection';
 
 const ContactPage = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    subject: '',
+    phone: '',
     message: ''
   });
 
@@ -19,12 +20,31 @@ const ContactPage = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    // TODO: Connect to backend API
-    alert("Thank you for contacting us! We will get back to you shortly.");
-    setFormData({ name: '', email: '', subject: '', message: '' });
+    const apiUrl = import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? 'https://mlx-direct-api.onrender.com/api' : 'http://localhost:5000/api');
+    
+    try {
+      const response = await fetch(`${apiUrl.replace('/api', '')}/api/contact/submit`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Thank you for contacting us! We will get back to you shortly.");
+        setFormData({ name: '', email: '', phone: '', message: '' });
+      } else {
+        alert(data.message || "Failed to send message. Please try again.");
+      }
+    } catch (err) {
+      console.error("Submission error:", err);
+      alert("Something went wrong. Please try again later.");
+    }
   };
 
   return (
@@ -76,8 +96,18 @@ const ContactPage = () => {
                          <FaMapMarkerAlt />
                       </div>
                       <div>
-                         <h6 className="font-black text-xs uppercase tracking-widest text-gray-900 mb-2">Headquarters</h6>
+                         <h6 className="font-black text-xs uppercase tracking-widest text-gray-900 mb-2">Corporate HQ (USA)</h6>
                          <p className="text-sm font-medium text-gray-500">Fort Lauderdale, Florida,<br/> United States</p>
+                      </div>
+                   </div>
+
+                   <div className="flex items-start gap-6 group">
+                      <div className="w-14 h-14 bg-white shadow-xl flex items-center justify-center text-primary-green text-xl group-hover:bg-primary-green group-hover:text-white transition-colors duration-300">
+                         <FaMapMarkerAlt />
+                      </div>
+                      <div>
+                         <h6 className="font-black text-xs uppercase tracking-widest text-gray-900 mb-2">Indian Branch</h6>
+                         <p className="text-sm font-medium text-gray-500">Dumdum, kolkata,<br/>West Bengal-700055</p>
                       </div>
                    </div>
 
@@ -98,6 +128,7 @@ const ContactPage = () => {
                       <div>
                          <h6 className="font-black text-xs uppercase tracking-widest text-gray-900 mb-2">Email Address</h6>
                          <p className="text-sm font-medium text-gray-500">admin@mlxdirect.com</p>
+                         <p className="text-sm font-medium text-gray-500">info@mlxdirect.com</p>
                       </div>
                    </div>
 
@@ -147,12 +178,12 @@ const ContactPage = () => {
                    </div>
 
                    <div className="flex flex-col relative group">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 transition-colors group-focus-within:text-primary-green">Subject</label>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2 transition-colors group-focus-within:text-primary-green">Phone Number</label>
                       <input 
-                         type="text" 
-                         name="subject"
+                         type="tel" 
+                         name="phone"
                          required
-                         value={formData.subject}
+                         value={formData.phone}
                          onChange={handleChange}
                          className="border-b-2 border-gray-200 py-2 focus:outline-none focus:border-primary-green bg-transparent transition-colors text-sm font-medium text-gray-700" 
                       />
@@ -196,6 +227,7 @@ const ContactPage = () => {
         </div>
       </section>
 
+      <MapSection />
     </div>
   );
 };

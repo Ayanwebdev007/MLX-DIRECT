@@ -3,7 +3,8 @@ import axios from 'axios';
 import { 
   FaUsers, FaWallet, FaHistory, FaCheckCircle, FaTimesCircle, FaPlus, 
   FaTools, FaSearch, FaImage, FaTrash, FaCloudUploadAlt, FaSignOutAlt, 
-  FaExclamationTriangle, FaUniversity, FaUserShield, FaCopy, FaChartLine
+  FaExclamationTriangle, FaUniversity, FaUserShield, FaCopy, FaChartLine, 
+  FaEnvelope, FaBars, FaPaperPlane, FaInbox, FaReply
 } from 'react-icons/fa';
 
 const AdminDashboard = () => {
@@ -11,6 +12,9 @@ const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
   const [withdrawals, setWithdrawals] = useState([]);
   const [banners, setBanners] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [selectedMessage, setSelectedMessage] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -24,12 +28,18 @@ const AdminDashboard = () => {
   const [bannerTitle, setBannerTitle] = useState('');
   const [bannerLink, setBannerLink] = useState('');
   const [bannerFile, setBannerFile] = useState(null);
+  const [emailData, setEmailData] = useState({ to: '', subject: '', message: '' });
+  const [emailFile, setEmailFile] = useState(null);
+  const [sentEmails, setSentEmails] = useState([]);
+  const [mailFolder, setMailFolder] = useState('inbox');
+  const [isComposing, setIsComposing] = useState(false);
   const fileInputRef = useRef(null);
+  const mailInputRef = useRef(null);
 
   const BRAND_BLUE = '#003B91';
   const BRAND_RED = '#CE2029';
 
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://mlx-direct-api.onrender.com/api';
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? 'https://mlx-direct-api.onrender.com/api' : 'http://localhost:5000/api');
   const token = localStorage.getItem('token');
   const headers = { Authorization: `Bearer ${token}` };
 
@@ -52,6 +62,12 @@ const AdminDashboard = () => {
       } else if (activeTab === 'banners') {
         const res = await axios.get(`${API_BASE_URL}/banners`, { headers });
         setBanners(res.data);
+      } else if (activeTab === 'enquiry') {
+        const res = await axios.get(`${API_BASE_URL}/contact/messages`, { headers });
+        setMessages(res.data);
+      } else if (activeTab === 'mail') {
+        const res = await axios.get(`${API_BASE_URL}/admin/sent-emails`, { headers });
+        setSentEmails(res.data);
       }
     } catch (err) {
       console.error(err);
@@ -172,6 +188,66 @@ const AdminDashboard = () => {
 
   const handleFileChange = (e) => setBannerFile(e.target.files[0]);
 
+  const handleMarkAsRead = async (id) => {
+    try {
+      await axios.patch(`${API_BASE_URL}/contact/messages/${id}/read`, {}, { headers });
+      fetchData();
+    } catch (err) {
+      alert('Failed to update status');
+    }
+  };
+
+  const handleDeleteMessage = async (id) => {
+    if (!window.confirm('Delete this message?')) return;
+    try {
+      await axios.delete(`${API_BASE_URL}/contact/messages/${id}`, { headers });
+      fetchData();
+      if (selectedMessage && selectedMessage._id === id) setSelectedMessage(null);
+    } catch (err) {
+      alert('Delete failed');
+    }
+  };
+
+  const handleViewMessage = (msg) => {
+    setSelectedMessage(msg);
+    if (msg.status === 'unread') {
+      handleMarkAsRead(msg._id);
+    }
+  };
+
+  const handleSendEmail = async (e) => {
+    e.preventDefault();
+    if (!emailData.to || !emailData.subject || !emailData.message) {
+      alert('Please fill all fields');
+      return;
+    }
+    setLoading(true);
+
+    const formData = new FormData();
+    formData.append('to', emailData.to);
+    formData.append('subject', emailData.subject);
+    formData.append('message', emailData.message);
+    if (emailFile) {
+      formData.append('attachment', emailFile);
+    }
+
+    try {
+      await axios.post(`${API_BASE_URL}/admin/send-email`, formData, { 
+        headers: { ...headers, 'Content-Type': 'multipart/form-data' } 
+      });
+      alert('Email sent successfully');
+      setEmailData({ to: '', subject: '', message: '' });
+      setEmailFile(null);
+      setIsComposing(false);
+      fetchData(); // Refresh history
+    } catch (err) {
+      const errMsg = err.response?.data?.message || 'Failed to send email';
+      const detail = err.response?.data?.error?.message || err.response?.data?.error || '';
+      alert(`${errMsg}${detail ? ': ' + detail : ''}`);
+    }
+    setLoading(false);
+  };
+
   const filteredUsers = users.filter(u => 
     u.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
     u.email.toLowerCase().includes(searchTerm.toLowerCase())
@@ -185,28 +261,43 @@ const AdminDashboard = () => {
   const isModalActive = !!showModal;
 
   return (
-    <div className="flex h-screen bg-[#fcfdfe] text-[#1e293b] font-sans overflow-hidden">
-      <aside className={`w-60 bg-[#003B91] border-r border-white/10 flex flex-col z-50`}>
+    <div className="flex h-screen bg-[#fcfdfe] text-[#1e293b] font-sans overflow-hidden relative">
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[55] lg:hidden animate-in fade-in duration-300" 
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      <aside className={`fixed lg:relative lg:flex w-64 bg-[#003B91] border-r border-white/10 flex flex-col z-[60] transition-transform duration-300 h-full ${
+        isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+      }`}>
         <div className="px-6 py-8 border-b border-white/5">
-          <div className="flex items-center space-x-3 mb-10">
-            <div className="flex items-center justify-center shrink-0">
-              <img src="/app_logo.png" alt="Logo" className="w-12 h-12 object-contain" />
+          <div className="flex items-center justify-between mb-10">
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center justify-center shrink-0">
+                <img src="/app_logo.png" alt="Logo" className="w-12 h-12 object-contain" />
+              </div>
+              <div className="overflow-hidden">
+                <h1 className="text-[11px] font-bold tracking-widest text-white/90 leading-tight uppercase">BOA PAY ADMIN</h1>
+              </div>
             </div>
-            <div className="overflow-hidden">
-              <h1 className="text-[11px] font-bold tracking-widest text-white/90 leading-tight uppercase">BOA PAY ADMIN</h1>
-            </div>
+            <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-white/60 hover:text-white"><FaPlus className="rotate-45" size={20} /></button>
           </div>
 
           <nav className="space-y-1.5">
             {[
               { id: 'dashboard', icon: <FaChartLine />, label: 'Dashboard' },
+              { id: 'enquiry', icon: <FaEnvelope />, label: `Enquiries ${messages.filter(m => m.status === 'unread').length > 0 ? '(' + messages.filter(m => m.status === 'unread').length + ')' : ''}` },
+              { id: 'mail', icon: <FaPaperPlane />, label: 'Mail Hub' },
               { id: 'users', icon: <FaUsers />, label: 'User List' },
               { id: 'withdrawals', icon: <FaHistory />, label: 'Payout List' },
               { id: 'banners', icon: <FaImage />, label: 'Banners' }
             ].map(item => (
               <button
                 key={item.id}
-                onClick={() => setActiveTab(item.id)}
+                onClick={() => { setActiveTab(item.id); setIsSidebarOpen(false); }}
                 className={`w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
                   activeTab === item.id 
                     ? 'bg-white text-[#003B91] shadow-xl' 
@@ -232,31 +323,44 @@ const AdminDashboard = () => {
       </aside>
 
       <main className="flex-1 flex flex-col overflow-hidden">
-        <header className="bg-white border-b border-slate-200 px-8 py-5 flex justify-between items-center z-40 shadow-sm">
-          <div>
-            <h2 className="text-xl font-bold text-slate-900 tracking-tight">
-              {activeTab === 'dashboard' ? 'Dashboard' : activeTab === 'users' ? 'User List' : activeTab === 'withdrawals' ? 'Payouts' : 'Banners'}
-            </h2>
-            <p className="text-[10px] font-bold text-slate-400 mt-0.5 uppercase tracking-wider">System Online</p>
+        <header className="bg-white border-b border-slate-200 px-4 sm:px-8 py-5 flex justify-between items-center z-40 shadow-sm">
+          <div className="flex items-center space-x-4">
+            <button 
+              onClick={() => setIsSidebarOpen(true)}
+              className="lg:hidden p-2.5 bg-slate-50 text-slate-600 rounded-xl border border-slate-200"
+            >
+              <FaBars size={18} />
+            </button>
+            <div>
+              <h2 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
+                {activeTab === 'dashboard' ? 'Dashboard' : 
+                 activeTab === 'enquiry' ? 'Website Enquiries' :
+                 activeTab === 'mail' ? 'Mail Hub (Strictly Email)' :
+                 activeTab === 'users' ? 'User List' : 
+                 activeTab === 'withdrawals' ? 'Payouts' : 
+                 'Banners'}
+              </h2>
+              <p className="text-[10px] font-bold text-slate-400 mt-0.5 uppercase tracking-wider">System Online</p>
+            </div>
           </div>
           
-          <div className="flex items-center space-x-6">
+          <div className="flex items-center space-x-3 sm:space-x-6">
              <div className="text-right hidden sm:block">
                 <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0.2">Total App Balance</p>
-                <p style={{ color: BRAND_BLUE }} className="text-base font-bold">₹ {stats?.globalLiquidity?.toLocaleString() || '0.00'}</p>
+                <p style={{ color: BRAND_BLUE }} className="text-sm sm:text-base font-bold">₹ {stats?.globalLiquidity?.toLocaleString() || '0.00'}</p>
              </div>
-             <div className="h-10 w-px bg-slate-200 mx-1"></div>
-             <div style={{ borderColor: BRAND_BLUE }} className="w-10 h-10 rounded-xl bg-slate-50 border-2 flex items-center justify-center text-slate-500 shadow-inner">
-                <FaUserShield className="text-[#003B91]" size={18} />
+             <div className="h-8 sm:h-10 w-px bg-slate-200 mx-1"></div>
+             <div style={{ borderColor: BRAND_BLUE }} className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-slate-50 border-2 flex items-center justify-center text-slate-500 shadow-inner">
+                <FaUserShield className="text-[#003B91]" size={16} />
              </div>
           </div>
         </header>
 
-        <section className="flex-1 overflow-y-auto p-8 bg-[#fcfdfe]">
+        <section className="flex-1 overflow-y-auto p-4 sm:p-8 bg-[#fcfdfe]">
           {activeTab === 'dashboard' && stats && (
             <div className="space-y-8 animate-in fade-in duration-500">
                {/* Stats Summary Row */}
-               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   {[
                     { label: 'Total Users', val: stats.totalUsers, icon: <FaUsers />, color: BRAND_BLUE },
                     { label: 'Total Balance', val: `₹${stats.globalLiquidity?.toLocaleString()}`, icon: <FaWallet />, color: BRAND_BLUE },
@@ -421,55 +525,113 @@ const AdminDashboard = () => {
                 />
               </div>
 
-              <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-                <table className="w-full text-left">
-                  <thead>
-                    <tr className="bg-slate-50/50 text-slate-400 text-[10px] font-bold uppercase tracking-widest border-b border-slate-100">
-                      <th className="px-8 py-5">User Info</th>
-                      <th className="px-8 py-5 text-center">Status</th>
-                      <th className="px-8 py-5 text-center">Balance</th>
-                      <th className="px-8 py-5 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-50">
-                    {filteredUsers.map((u) => (
-                      <tr key={u._id} className="hover:bg-slate-50/50 transition-colors">
-                        <td className="px-8 py-5">
-                          <div className="flex items-center space-x-4">
-                            <div style={{ backgroundColor: BRAND_BLUE }} className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold text-white uppercase shadow-md">{u.name[0]}</div>
-                            <div className="flex flex-col">
-                              <p className="font-bold text-slate-900 text-sm tracking-tight">{u.name}</p>
-                              <p className="text-[10px] text-slate-400 font-bold">{u.email}</p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-8 py-5">
-                          <div className="flex justify-center space-x-2">
-                             <span className={`px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase border ${u.kyc?.status === 'approved' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-slate-50 text-slate-400 border-slate-200'}`}>KYC: {u.kyc?.status || 'No Info'}</span>
-                             <span className={`px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase border ${u.bankDetails?.verified ? 'bg-blue-50 text-[#003B91] border-blue-100' : 'bg-slate-50 text-slate-400 border-slate-200'}`}>BANK: {u.bankDetails?.verified ? 'Verified' : 'Pending'}</span>
-                          </div>
-                        </td>
-                        <td className="px-8 py-5 text-center"><span className="font-bold text-slate-900 text-sm tracking-tight">₹{u.walletBalance.toLocaleString()}</span></td>
-                        <td className="px-8 py-5 text-right">
-                          <div className="flex justify-end space-x-2">
-                            <button onClick={() => { setSelectedUser(u); setShowModal('details'); }} title="View Details" className="p-3 bg-white text-slate-400 hover:text-[#003B91] rounded-xl border border-slate-100 hover:border-slate-300 transition-all shadow-sm"><FaSearch size={14} /></button>
-                            <button onClick={() => { setSelectedUser(u); setShowModal('deposit'); }} title="Add Money" className="p-3 bg-white text-slate-400 hover:text-emerald-600 rounded-xl border border-slate-100 hover:border-slate-300 transition-all shadow-sm"><FaPlus size={14} /></button>
-                            <button onClick={() => { setSelectedUser(u); setShowModal('updatePassword'); }} title="Change Password" style={{ color: BRAND_BLUE }} className="p-3 bg-white rounded-xl border border-slate-100 hover:border-slate-300 transition-all shadow-sm"><FaUserShield size={14} /></button>
-                            <button onClick={() => { setSelectedUser(u); setShowModal('limit'); }} title="Set Limit" className="p-3 bg-white text-slate-400 hover:text-slate-900 rounded-xl border border-slate-100 hover:border-slate-300 transition-all shadow-sm"><FaTools size={14} /></button>
-                            <button onClick={() => handleDeleteUser(u)} title="Delete User" className="p-3 bg-white text-slate-300 hover:text-[#CE2029] rounded-xl border border-slate-100 hover:border-red-100 transition-all shadow-sm"><FaTrash size={14} /></button>
-                          </div>
-                        </td>
+              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                {/* Desktop View Table - Hidden on small screens */}
+                <div className="hidden lg:block overflow-x-auto">
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="bg-slate-50/50 text-slate-400 text-[10px] font-bold uppercase tracking-widest border-b border-slate-100">
+                        <th className="px-8 py-5">User Info</th>
+                        <th className="px-8 py-5 text-center">Status</th>
+                        <th className="px-8 py-5 text-center">Balance</th>
+                        <th className="px-8 py-5 text-right">Actions</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-slate-50">
+                      {filteredUsers.map((u) => (
+                        <tr key={u._id} className="hover:bg-slate-50/50 transition-colors">
+                          <td className="px-8 py-5">
+                            <div className="flex items-center space-x-4">
+                              <div style={{ backgroundColor: BRAND_BLUE }} className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold text-white uppercase shadow-md">{u.name[0]}</div>
+                              <div className="flex flex-col">
+                                <p className="font-bold text-slate-900 text-sm tracking-tight">{u.name}</p>
+                                <p className="text-[10px] text-slate-400 font-bold">{u.email}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-8 py-5">
+                            <div className="flex justify-center space-x-2">
+                               <span className={`px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase border ${u.kyc?.status === 'approved' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-slate-50 text-slate-400 border-slate-200'}`}>KYC: {u.kyc?.status || 'No Info'}</span>
+                               <span className={`px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase border ${u.bankDetails?.verified ? 'bg-blue-50 text-[#003B91] border-blue-100' : 'bg-slate-50 text-slate-400 border-slate-200'}`}>BANK: {u.bankDetails?.verified ? 'Verified' : 'Pending'}</span>
+                            </div>
+                          </td>
+                          <td className="px-8 py-5 text-center"><span className="font-bold text-slate-900 text-sm tracking-tight">₹{u.walletBalance.toLocaleString()}</span></td>
+                          <td className="px-8 py-5 text-right">
+                            <div className="flex justify-end space-x-2">
+                              <button onClick={() => { setSelectedUser(u); setShowModal('details'); }} title="View Details" className="p-3 bg-white text-slate-400 hover:text-[#003B91] rounded-xl border border-slate-100 hover:border-slate-300 transition-all shadow-sm"><FaSearch size={14} /></button>
+                              <button onClick={() => { setSelectedUser(u); setShowModal('deposit'); }} title="Add Money" className="p-3 bg-white text-slate-400 hover:text-emerald-600 rounded-xl border border-slate-100 hover:border-slate-300 transition-all shadow-sm"><FaPlus size={14} /></button>
+                              <button onClick={() => { setSelectedUser(u); setShowModal('updatePassword'); }} title="Change Password" style={{ color: BRAND_BLUE }} className="p-3 bg-white rounded-xl border border-slate-100 hover:border-slate-300 transition-all shadow-sm"><FaUserShield size={14} /></button>
+                              <button onClick={() => { setSelectedUser(u); setShowModal('limit'); }} title="Set Limit" className="p-3 bg-white text-slate-400 hover:text-slate-900 rounded-xl border border-slate-100 hover:border-slate-300 transition-all shadow-sm"><FaTools size={14} /></button>
+                              <button onClick={() => handleDeleteUser(u)} title="Delete User" className="p-3 bg-white text-slate-300 hover:text-[#CE2029] rounded-xl border border-slate-100 hover:border-red-100 transition-all shadow-sm"><FaTrash size={14} /></button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Mobile View Card List - Hidden on desktop */}
+                <div className="lg:hidden divide-y divide-slate-100 bg-slate-50/30">
+                  {filteredUsers.length > 0 ? filteredUsers.map((u) => (
+                    <div key={u._id} className="p-5 bg-white space-y-5">
+                      <div className="flex justify-between items-start">
+                        <div className="flex items-center space-x-3">
+                          <div style={{ backgroundColor: BRAND_BLUE }} className="w-11 h-11 rounded-2xl flex items-center justify-center text-sm font-bold text-white uppercase shadow-lg ring-4 ring-slate-50">{u.name[0]}</div>
+                          <div>
+                            <p className="font-extrabold text-slate-900 text-[15px] tracking-tight">{u.name}</p>
+                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">{u.email}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Vault Balance</p>
+                          <p style={{ color: BRAND_BLUE }} className="text-lg font-black tracking-tighter">₹{u.walletBalance?.toLocaleString()}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2 pt-1">
+                        <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${u.kyc?.status === 'approved' ? 'bg-green-50 text-green-700 border-green-100' : 'bg-slate-50 text-slate-400 border-slate-200'}`}>
+                          KYC: {u.kyc?.status || 'No Info'}
+                        </span>
+                        <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${u.bankDetails?.verified ? 'bg-blue-50 text-blue-700 border-blue-100' : 'bg-slate-50 text-slate-400 border-slate-200'}`}>
+                          BANK: {u.bankDetails?.verified ? 'Verified' : 'Pending'}
+                        </span>
+                        <span className="bg-slate-50 text-slate-500 text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-widest border border-slate-100">Status: Active</span>
+                      </div>
+
+                      <div className="grid grid-cols-5 gap-3 pt-2">
+                        {[
+                          { icon: <FaSearch />, label: 'View', color: 'text-slate-400', hover: 'hover:text-[#003B91]', action: () => { setSelectedUser(u); setShowModal('details'); } },
+                          { icon: <FaPlus />, label: 'Fund', color: 'text-slate-400', hover: 'hover:text-green-600', action: () => { setSelectedUser(u); setShowModal('deposit'); } },
+                          { icon: <FaUserShield />, label: 'Auth', color: 'text-slate-400', hover: 'hover:text-[#003B91]', action: () => { setSelectedUser(u); setShowModal('updatePassword'); } },
+                          { icon: <FaTools />, label: 'Limit', color: 'text-slate-400', hover: 'hover:text-[#003B91]', action: () => { setSelectedUser(u); setShowModal('limit'); } },
+                          { icon: <FaTrash />, label: 'Delete', color: 'text-slate-300', hover: 'hover:text-[#CE2029]', action: () => handleDeleteUser(u) }
+                        ].map((btn, idx) => (
+                          <button 
+                            key={idx}
+                            onClick={btn.action}
+                            className={`flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-50 border border-slate-100 transition-all active:scale-95 active:bg-white shadow-sm`}
+                          >
+                            <span className={`${btn.color} ${btn.hover} mb-1.5 text-[15px]`}>{btn.icon}</span>
+                            <span className="text-[8px] font-black uppercase tracking-wider text-slate-400">{btn.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )) : (
+                    <div className="py-20 text-center space-y-3">
+                      <FaUsers className="mx-auto text-slate-100" size={48} />
+                      <p className="text-xs font-black text-slate-300 uppercase tracking-[0.2em] italic">No active users discovered</p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}
 
           {activeTab === 'withdrawals' && (
             <div className="max-w-5xl mx-auto animate-in fade-in duration-300">
-               <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+               <div className="bg-white rounded-2xl border border-slate-200 overflow-x-auto shadow-sm">
                 <table className="w-full text-left">
                   <thead>
                     <tr className="bg-slate-50/50 text-slate-400 text-[10px] font-bold uppercase tracking-widest border-b border-slate-100">
@@ -509,7 +671,7 @@ const AdminDashboard = () => {
               <div className="bg-white rounded-[32px] border border-slate-200 p-10 shadow-sm">
                 <h3 style={{ color: BRAND_BLUE }} className="text-sm font-bold mb-8 uppercase tracking-[0.2em] flex items-center"><FaCloudUploadAlt className="mr-3" /> Add New Banner</h3>
                 <form onSubmit={handleAddBanner} className="space-y-8">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
                     <div className="space-y-2">
                        <label className="text-[10px] uppercase font-bold text-slate-400 tracking-widest px-1">Banner Title</label>
                        <input type="text" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold outline-none focus:border-[#003B91] transition-all" placeholder="Enter title..." value={bannerTitle} onChange={(e) => setBannerTitle(e.target.value)} required />
@@ -546,6 +708,300 @@ const AdminDashboard = () => {
               </div>
             </div>
           )}
+
+          {activeTab === 'enquiry' && (
+            <div className="max-w-6xl mx-auto animate-in fade-in duration-500">
+               <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
+                <div className="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/30">
+                  <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest flex items-center">
+                    <FaEnvelope className="mr-3 text-[#003B91]" /> Website Inquiries
+                  </h3>
+                  <span className="bg-blue-50 text-[#003B91] px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border border-blue-100 italic">
+                    {messages.filter(m => m.status === 'unread').length} New Inquiries
+                  </span>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="bg-slate-50/50 text-slate-400 text-[10px] font-bold uppercase tracking-widest border-b border-slate-100">
+                        <th className="px-10 py-5">Sender</th>
+                        <th className="px-10 py-5">Message Snippet</th>
+                        <th className="px-10 py-5">Status</th>
+                        <th className="px-10 py-5 text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-50">
+                      {messages.length > 0 ? messages.map((m) => (
+                        <tr key={m._id} className={`hover:bg-slate-50/30 transition-colors ${m.status === 'unread' ? 'bg-blue-50/10' : ''}`}>
+                          <td className="px-10 py-6">
+                            <p className={`text-sm ${m.status === 'unread' ? 'font-black text-slate-900' : 'font-bold text-slate-600'}`}>{m.name}</p>
+                            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">{m.email}</p>
+                          </td>
+                          <td className="px-10 py-6">
+                            <p className="text-xs text-slate-500 font-medium truncate max-w-xs">{m.message}</p>
+                            <p className="text-[9px] text-slate-300 font-black uppercase mt-1">Received {new Date(m.createdAt).toLocaleDateString()}</p>
+                          </td>
+                          <td className="px-10 py-6">
+                            <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${m.status === 'read' ? 'bg-slate-50 text-slate-400 border-slate-200' : 'bg-blue-50 text-[#003B91] border-blue-100'}`}>
+                              {m.status}
+                            </span>
+                          </td>
+                          <td className="px-10 py-6 text-right">
+                            <div className="flex justify-end space-x-2">
+                               <button 
+                                 onClick={() => { 
+                                   setEmailData({ to: m.email, subject: `RE: Website Inquiry - ${m.name}`, message: `Hello ${m.name},\n\n` });
+                                   setActiveTab('mail');
+                                   setIsComposing(true);
+                                 }}
+                                 title="Reply via Email"
+                                 className="p-2.5 bg-white text-slate-400 hover:text-[#003B91] rounded-xl border border-slate-100 hover:border-slate-300 transition-all shadow-sm"
+                               >
+                                 <FaReply size={14} />
+                               </button>
+                               <button 
+                                 onClick={() => handleDeleteMessage(m._id)}
+                                 className="p-2.5 bg-white text-slate-300 hover:text-[#CE2029] rounded-xl border border-slate-100 hover:border-red-100 transition-all shadow-sm"
+                               >
+                                 <FaTrash size={14} />
+                               </button>
+                            </div>
+                          </td>
+                        </tr>
+                      )) : (
+                        <tr>
+                          <td colSpan="4" className="py-20 text-center opacity-30 italic font-bold text-slate-300 uppercase tracking-widest text-xs">No inquiries recorded</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'mail' && (
+            <div className="flex flex-col lg:flex-row h-full -m-4 sm:-m-8 animate-in fade-in slide-in-from-bottom-4 duration-500 overflow-hidden">
+              {/* Mail Sidebar */}
+              <div className="w-full lg:w-72 bg-white border-r border-slate-200 flex flex-col p-4 sm:p-6 space-y-6">
+                <button 
+                  onClick={() => setIsComposing(true)}
+                  style={{ backgroundColor: BRAND_BLUE }} 
+                  className="w-full py-4 rounded-2xl text-white font-bold text-xs uppercase tracking-widest shadow-lg shadow-blue-500/20 hover:scale-[1.02] transition-all flex items-center justify-center italic"
+                >
+                  <FaPlus className="mr-2" /> Compose
+                </button>
+
+                <nav className="space-y-2">
+                  {[
+                    { id: 'inbox', label: 'Inbox', icon: <FaInbox />, count: sentEmails.filter(e => e.direction === 'received').length },
+                    { id: 'sent', label: 'Sent History', icon: <FaPaperPlane />, count: sentEmails.filter(e => e.direction === 'sent').length }
+                  ].map(folder => (
+                    <button
+                      key={folder.id}
+                      onClick={() => { setMailFolder(folder.id); setSelectedMessage(null); setIsComposing(false); }}
+                      className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold transition-all ${
+                        mailFolder === folder.id ? 'bg-blue-50 text-[#003B91]' : 'text-slate-400 hover:bg-slate-50'
+                      }`}
+                    >
+                      <div className="flex items-center">
+                        <span className="mr-3 opacity-70">{folder.icon}</span>
+                        <span className="uppercase tracking-widest">{folder.label}</span>
+                      </div>
+                      {folder.count > 0 && (
+                        <span className={`px-2 py-0.5 rounded-full text-[9px] ${mailFolder === folder.id ? 'bg-[#003B91] text-white' : 'bg-slate-100 text-slate-500'}`}>
+                          {folder.count}
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </nav>
+              </div>
+
+              {/* Mail Content Area */}
+              <div className="flex-1 bg-white relative flex flex-col overflow-hidden">
+                {isComposing ? (
+                  /* Mail Composer - High End */
+                  <div className="flex-1 p-6 sm:p-10 overflow-y-auto bg-slate-50/10">
+                    <div className="max-w-3xl mx-auto bg-white rounded-3xl border border-slate-200 shadow-xl p-6 sm:p-10">
+                      <div className="flex justify-between items-center mb-10">
+                        <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest flex items-center">
+                          <FaPaperPlane className="mr-3 text-[#003B91]" /> New Message
+                        </h3>
+                        <button onClick={() => setIsComposing(false)} className="text-slate-400 hover:text-slate-900 transition-colors"><FaTimesCircle size={20} /></button>
+                      </div>
+
+                      <form onSubmit={handleSendEmail} className="space-y-6">
+                        <input 
+                          type="email" 
+                          placeholder="Recipient Email" 
+                          className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold outline-none focus:border-[#003B91] focus:bg-white transition-all shadow-sm"
+                          value={emailData.to}
+                          onChange={(e) => setEmailData({...emailData, to: e.target.value})}
+                          required
+                        />
+                        <input 
+                          type="text" 
+                          placeholder="Subject Line" 
+                          className="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold outline-none focus:border-[#003B91] focus:bg-white transition-all shadow-sm"
+                          value={emailData.subject}
+                          onChange={(e) => setEmailData({...emailData, subject: e.target.value})}
+                          required
+                        />
+                        <textarea 
+                          rows="10"
+                          placeholder="Write your professional message..."
+                          className="w-full px-6 py-5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-medium outline-none focus:border-[#003B91] focus:bg-white transition-all resize-none shadow-sm"
+                          value={emailData.message}
+                          onChange={(e) => setEmailData({...emailData, message: e.target.value})}
+                          required
+                        ></textarea>
+
+                        <div className="flex items-center justify-between pt-4">
+                          <div className="flex items-center space-x-4">
+                            <input type="file" className="hidden" ref={mailInputRef} onChange={(e) => setEmailFile(e.target.files[0])} />
+                            <button type="button" onClick={() => mailInputRef.current.click()} className="flex items-center space-x-2 text-[10px] font-black uppercase text-slate-400 hover:text-[#003B91] transition-colors tracking-widest italic bg-slate-50 px-4 py-2.5 rounded-xl border border-slate-100">
+                               <FaCloudUploadAlt size={16} /> 
+                               <span>{emailFile ? emailFile.name : 'Attach File'}</span>
+                            </button>
+                            {emailFile && (
+                              <button type="button" onClick={() => setEmailFile(null)} className="text-red-400 hover:text-red-600"><FaTimesCircle size={14} /></button>
+                            )}
+                          </div>
+                          <button 
+                            type="submit"
+                            disabled={loading}
+                            style={{ backgroundColor: BRAND_BLUE }}
+                            className="px-10 py-4 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest italic shadow-xl shadow-blue-500/10 active:scale-95 transition-all"
+                          >
+                            {loading ? 'Processing...' : 'Send Now'}
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                ) : selectedMessage ? (
+                  /* Message Viewer */
+                  <div className="flex-1 flex flex-col bg-slate-50/10">
+                    <div className="bg-white border-b border-slate-200 px-8 py-5 flex items-center justify-between">
+                       <button onClick={() => setSelectedMessage(null)} className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-slate-900 transition-colors flex items-center">&larr; Back to {mailFolder}</button>
+                       <div className="flex space-x-3">
+                          <button 
+                            onClick={() => {
+                              setEmailData({ to: selectedMessage.email || selectedMessage.to, subject: `Re: ${selectedMessage.subject || 'Admin Support'}`, message: `Hello ${selectedMessage.name || ''},\n\n` });
+                              setIsComposing(true);
+                            }}
+                            style={{ backgroundColor: BRAND_BLUE }}
+                            className="px-6 py-2.5 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest italic flex items-center"
+                          >
+                            <FaReply className="mr-2" /> Reply
+                          </button>
+                          <button 
+                            onClick={() => mailFolder === 'inbox' ? handleDeleteMessage(selectedMessage._id) : alert('Delete protected for sent history')} 
+                            className="p-2.5 bg-slate-50 text-slate-300 hover:text-[#CE2029] rounded-xl border border-slate-200 transition-all shadow-sm"
+                          >
+                            <FaTrash size={14} />
+                          </button>
+                       </div>
+                    </div>
+                    <div className="flex-1 p-8 sm:p-12 overflow-y-auto">
+                      <div className="max-w-4xl mx-auto space-y-8">
+                        <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-tight">{selectedMessage.subject || 'Administrative Inquiry'}</h2>
+                        <div className="flex items-center justify-between border-b border-slate-100 pb-6">
+                        <div className="flex items-center justify-between border-b border-slate-100 pb-6">
+                           <div className="flex items-center space-x-4">
+                              <div style={{ backgroundColor: BRAND_BLUE }} className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black">
+                                {selectedMessage.direction === 'received' ? (selectedMessage.senderName ? selectedMessage.senderName[0] : (selectedMessage.from ? selectedMessage.from[0] : 'R')) : (selectedMessage.to ? selectedMessage.to[0] : 'S')}
+                              </div>
+                              <div>
+                                 <p className="font-black text-slate-900 text-sm tracking-tight">
+                                    {selectedMessage.direction === 'received' ? (selectedMessage.senderName || selectedMessage.from) : `To: ${selectedMessage.to}`}
+                                 </p>
+                                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                                    {selectedMessage.direction === 'received' ? `From: ${selectedMessage.from}` : `Recipient: ${selectedMessage.to}`}
+                                    {selectedMessage.phone && ` • ${selectedMessage.phone}`}
+                                 </p>
+                              </div>
+                           </div>
+                           <div className="text-right flex flex-col items-end">
+                              <span className={`mb-2 text-[8px] font-black uppercase tracking-widest px-2 py-1 rounded-lg border ${selectedMessage.direction === 'received' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-blue-50 text-blue-600 border-blue-100'}`}>
+                                 {selectedMessage.direction}
+                              </span>
+                              <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.15em]">{new Date(selectedMessage.createdAt).toLocaleString()}</p>
+                           </div>
+                        </div>
+                        <div className="prose max-w-none text-slate-700 leading-relaxed font-medium text-sm bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm overflow-hidden">
+                           {selectedMessage.html ? (
+                              <div dangerouslySetInnerHTML={{ __html: selectedMessage.html }} />
+                           ) : (
+                              <div className="whitespace-pre-line">{selectedMessage.message}</div>
+                           )}
+                        </div>
+                        {selectedMessage.attachmentName && (
+                           <div className="mt-8 p-5 bg-blue-50/50 rounded-2xl border border-blue-100 border-dashed flex items-center justify-between">
+                              <div className="flex items-center space-x-3">
+                                 <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-[#003B91] border border-blue-100 shadow-sm"><FaCloudUploadAlt size={18} /></div>
+                                 <p className="text-xs font-black text-[#003B91] uppercase tracking-widest">{selectedMessage.attachmentName}</p>
+                              </div>
+                           </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  /* Mail Grid List */
+                  <div className="flex-1 overflow-y-auto bg-slate-50/10">
+                    <div className="divide-y divide-slate-50">
+                      {(mailFolder === 'inbox' ? sentEmails.filter(e => e.direction === 'received') : sentEmails.filter(e => e.direction === 'sent')).length > 0 ? 
+                       (mailFolder === 'inbox' ? sentEmails.filter(e => e.direction === 'received') : sentEmails.filter(e => e.direction === 'sent')).map((msg) => (
+                        <div 
+                          key={msg._id} 
+                          onClick={() => { setSelectedMessage(msg); }}
+                          className={`group flex items-center justify-between px-8 py-6 cursor-pointer hover:bg-slate-50 transition-all bg-white`}
+                        >
+                          <div className="flex items-center space-x-6 flex-1 overflow-hidden">
+                             <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 text-xs font-black uppercase group-hover:bg-white group-hover:text-[#003B91] transition-all">
+                                {msg.senderName ? msg.senderName[0] : (msg.from ? msg.from[0] : (msg.to ? msg.to[0] : 'U'))}
+                             </div>
+                             <div className="flex-1 overflow-hidden pr-10">
+                                <div className="flex items-center space-x-2">
+                                   <p className={`text-sm truncate leading-none font-black text-slate-900`}>
+                                      {mailFolder === 'inbox' ? (msg.senderName || msg.from) : (msg.to)}
+                                   </p>
+                                   {msg.attachmentName && <span className="text-[10px] text-[#003B91] opacity-40"><FaCloudUploadAlt size={12} /></span>}
+                                   <span className={`text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded border ${msg.direction === 'received' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-blue-50 text-blue-600 border-blue-100'}`}>
+                                      {msg.direction}
+                                   </span>
+                                </div>
+                                <p className={`text-[12px] truncate mt-1.5 font-bold text-slate-400`}>
+                                   <span className="font-extrabold text-slate-600">{msg.subject || 'No Subject'}</span>
+                                   <span className="mx-2 opacity-30">•</span>
+                                   <span>{msg.message.substring(0, 80)}...</span>
+                                </p>
+                             </div>
+                          </div>
+                          <div className="text-right shrink-0">
+                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{new Date(msg.createdAt).toLocaleDateString([], { month: 'short', day: 'numeric' })}</p>
+                          </div>
+                        </div>
+                      )) : (
+                        <div className="h-[500px] flex flex-col items-center justify-center text-slate-300 space-y-3 opacity-50">
+                           <FaEnvelope size={48} />
+                           <p className="text-[11px] font-black uppercase tracking-[0.2em] italic tracking-widest">No mail records in {mailFolder}</p>
+                        </div>
+                      )}
+                    </div>              </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+
+
+
+
+
         </section>
       </main>
 

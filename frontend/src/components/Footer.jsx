@@ -87,17 +87,28 @@ const Footer = () => {
                   <span className="text-sm font-bold text-white">+1 (806) 429 1952</span>
                 </div>
               </li>
-              <li className="flex items-start gap-4">
-                <FaEnvelope className="text-primary-green mt-1" />
-                <span className="text-sm font-medium text-gray-400 hover:text-primary-green cursor-pointer transition-colors tracking-tight">admin@mlxdirect.com</span>
+              <li className="flex flex-col items-start gap-4">
+                <div className="flex items-start gap-4">
+                  <FaEnvelope className="text-primary-green mt-1" />
+                  <span className="text-sm font-medium text-gray-400 hover:text-primary-green cursor-pointer transition-colors tracking-tight">admin@mlxdirect.com</span>
+                </div>
+                <div className="flex items-start gap-4">
+                  <FaEnvelope className="text-primary-green mt-1" />
+                  <span className="text-sm font-medium text-gray-400 hover:text-primary-green cursor-pointer transition-colors tracking-tight">info@mlxdirect.com</span>
+                </div>
               </li>
               <li className="flex items-start gap-4">
                 <FaMapMarkerAlt className="text-primary-green mt-1 text-lg" />
-                <div className="flex flex-col gap-4">
-                   <div>
-                      <p className="text-[10px] font-black text-primary-green uppercase tracking-widest mb-1">Corporate HQ</p>
-                      <p className="text-sm font-light text-gray-400 leading-tight">Fort Lauderdale, Florida,<br />United States</p>
-                   </div>
+                <div>
+                   <p className="text-[10px] font-black text-primary-green uppercase tracking-widest mb-1">Corporate HQ (USA)</p>
+                   <p className="text-sm font-light text-gray-400 leading-tight">Fort Lauderdale, Florida,<br />United States</p>
+                </div>
+              </li>
+              <li className="flex items-start gap-4">
+                <FaMapMarkerAlt className="text-primary-green mt-1 text-lg" />
+                <div>
+                   <p className="text-[10px] font-black text-primary-green uppercase tracking-widest mb-1">Indian Branch</p>
+                   <p className="text-sm font-light text-gray-400 leading-tight">Dumdum, kolkata,<br />West Bengal-700055</p>
                 </div>
               </li>
             </ul>

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const Hero = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -59,7 +60,7 @@ const Hero = () => {
           </p>
 
           {/* Premium Interaction Point */}
-          <div className="flex items-center gap-8 group cursor-pointer w-fit">
+          <Link to="/about" className="flex items-center gap-8 group cursor-pointer w-fit no-underline">
             <div className="relative">
               <div className="w-16 h-16 rounded-full border border-primary-green flex items-center justify-center group-hover:bg-primary-green transition-all duration-500">
                 <svg className="w-6 h-6 text-primary-green group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -71,7 +72,7 @@ const Hero = () => {
             <span className="text-sm font-black tracking-widest uppercase group-hover:text-primary-green transition-colors">
               Explore MLX DIRECT
             </span>
-          </div>
+          </Link>
 
         </div>
       </div>

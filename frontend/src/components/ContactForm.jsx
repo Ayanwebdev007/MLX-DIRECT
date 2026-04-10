@@ -20,7 +20,7 @@ const ContactForm = () => {
     };
   }, []);
 
-  const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: '' });
   const [status, setStatus] = useState({ type: '', message: '' });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -29,10 +29,10 @@ const ContactForm = () => {
     setIsLoading(true);
     setStatus({ type: '', message: '' });
 
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const apiUrl = import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? 'https://mlx-direct-api.onrender.com/api' : 'http://localhost:5000/api');
 
     try {
-      const response = await fetch(`${apiUrl}/api/contact`, {
+      const response = await fetch(`${apiUrl.replace('/api', '')}/api/contact/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -40,9 +40,10 @@ const ContactForm = () => {
 
       if (response.ok) {
         setStatus({ type: 'success', message: 'Message sent successfully! We will contact you soon.' });
-        setFormData({ name: '', email: '', subject: '', message: '' });
+        setFormData({ name: '', email: '', phone: '', message: '' });
       } else {
-        throw new Error('Failed to send message.');
+        const data = await response.json();
+        throw new Error(data.message || 'Failed to send message.');
       }
     } catch (err) {
       setStatus({ type: 'error', message: 'Something went wrong. Please try again later.' });
@@ -111,15 +112,16 @@ const ContactForm = () => {
             </div>
           </div>
 
-          {/* Subject Field */}
+          {/* Phone Field */}
           <div className="group flex flex-col gap-2">
-            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1 group-focus-within:text-primary-green transition-colors">Subject</label>
+            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1 group-focus-within:text-primary-green transition-colors">Phone Number</label>
             <input 
-              type="text" 
-              placeholder="Type the subject"
+              type="tel" 
+              placeholder="Type your phone number"
               className="bg-gray-50 border border-gray-200 px-6 py-4 text-gray-900 text-sm focus:bg-white focus:border-primary-green focus:outline-none focus:ring-4 focus:ring-primary-green/5 transition-all duration-300 rounded-sm placeholder:text-gray-400"
-              value={formData.subject}
-              onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+              value={formData.phone}
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              required
             />
           </div>
 

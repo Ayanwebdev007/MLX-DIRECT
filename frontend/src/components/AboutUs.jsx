@@ -129,7 +129,7 @@ const AboutUs = () => {
 
           {/* Cell 4: Engineering Precision (1/3 Width - but made 2/3 below mobile) */}
           <div className={`lg:col-span-1 row-span-1 relative rounded-sm overflow-hidden shadow-xl transition-all duration-1000 delay-700 group ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'}`}>
-             <img src="/portfolio/MLX 3.webp" alt="Precision Detail" className="w-full h-full object-cover brightness-75 group-hover:brightness-100 group-hover:scale-110 transition-all duration-1000" />
+             <img src="/construction-1.png" alt="Engineering Detail" className="w-full h-full object-cover brightness-75 group-hover:brightness-100 group-hover:scale-110 transition-all duration-1000" />
              <div className="absolute inset-0 bg-primary-green/10 mix-blend-overlay"></div>
           </div>
 

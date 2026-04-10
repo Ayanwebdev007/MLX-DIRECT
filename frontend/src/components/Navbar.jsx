@@ -17,9 +17,11 @@ const Navbar = () => {
           <li><Link to="/contact" className="hover:text-primary-green transition-colors">Contact Us</Link></li>
         </ul>
         <div className="flex-shrink-0">
-          <button className="bg-primary-green text-white px-6 py-3 rounded-full font-bold hover:bg-green-700 transition-all transform hover:-translate-y-0.5">
-            Get A Quote
-          </button>
+          <Link to="/contact">
+            <button className="bg-primary-green text-white px-6 py-3 rounded-full font-bold hover:bg-green-700 transition-all transform hover:-translate-y-0.5">
+              Get A Quote
+            </button>
+          </Link>
         </div>
       </div>
     </nav>

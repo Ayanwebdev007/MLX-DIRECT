@@ -22,6 +22,8 @@ const allowedOrigins = [
   'http://localhost:5175',
   'http://localhost:5005',
   'http://localhost:8000',
+  'http://192.168.29.60:5173',
+  'http://192.168.29.60:5005',
   'https://mlxdirect.com',
   process.env.FRONTEND_URL,
   process.env.ADMIN_URL,
@@ -54,6 +56,9 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/wallet', require('./routes/walletRoutes'));
 app.use('/api/banners', require('./routes/bannerRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
+app.use('/api/contact', require('./routes/contactRoutes'));
+app.use('/api/admin', require('./routes/adminRoutes'));
+
 
 app.get('/', (req, res) => {
   res.send('MLX DIRECT Backend is running.');
