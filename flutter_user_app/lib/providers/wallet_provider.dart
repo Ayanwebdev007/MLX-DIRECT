@@ -45,13 +45,14 @@ class WalletProvider with ChangeNotifier {
     return false;
   }
 
-  Future<bool> register(String name, String email, String password) async {
+  Future<bool> register(String name, String email, String phone, String password) async {
     _isLoading = true;
     notifyListeners();
     try {
       final response = await ApiService.post('/auth/register', {
         'name': name,
         'email': email,
+        'phone': phone,
         'password': password,
       });
 

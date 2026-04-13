@@ -133,7 +133,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    'Secure Payout',
+                    'Secure Bank',
                     style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppTheme.darkSlate, letterSpacing: -0.8),
                   ),
                   IconButton(

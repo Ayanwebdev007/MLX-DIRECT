@@ -4,18 +4,22 @@ const jwt = require('jsonwebtoken');
 // Register a new user
 exports.register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, phone } = req.body;
     
+    if (!name || !email || !password || !phone) {
+      return res.status(400).json({ message: 'All fields are required including mobile number' });
+    }
+
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    const user = new User({ name, email, password });
+    const user = new User({ name, email, password, phone });
     await user.save();
 
     const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
-    res.status(201).json({ token, user: { id: user._id, name: user.name, email: user.email, role: user.role } });
+    res.status(201).json({ token, user: { id: user._id, name: user.name, email: user.email, phone: user.phone, role: user.role } });
   } catch (error) {
     res.status(500).json({ message: 'Registration failed', error: error.message });
   }
@@ -32,7 +36,7 @@ exports.login = async (req, res) => {
     }
 
     const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
-    res.json({ token, user: { id: user._id, name: user.name, email: user.email, role: user.role } });
+    res.json({ token, user: { id: user._id, name: user.name, email: user.email, phone: user.phone, role: user.role } });
   } catch (error) {
     res.status(500).json({ message: 'Login failed', error: error.message });
   }
@@ -115,10 +119,10 @@ exports.updateKYC = async (req, res) => {
     if (!aadharRegex.test(aadhar)) return res.status(400).json({ message: 'Invalid Aadhar format' });
 
     await User.findByIdAndUpdate(req.user.id, {
-      kyc: { status: 'approved', pan, aadhar } // Automatically approved upon valid format
+      kyc: { status: 'pending', pan, aadhar } // Submitted for manual approval
     });
     
-    res.json({ message: 'KYC verified successfully' });
+    res.json({ message: 'Identity documents submitted for manual verification' });
   } catch (error) {
     res.status(500).json({ message: 'KYC submission failed', error: error.message });
   }
@@ -142,16 +146,17 @@ exports.updateBankDetails = async (req, res) => {
 
     await User.findByIdAndUpdate(req.user.id, {
       bankDetails: {
+        status: 'pending',
         accountHolderName: verification.registeredName,
         accountNumber,
         ifscCode,
         bankName,
-        verified: true
+        verified: false
       }
     });
-
+ 
     res.json({ 
-      message: 'Bank account verified successfully', 
+      message: 'Bank account details submitted for manual verification', 
       verifiedName: verification.registeredName 
     });
   } catch (error) {

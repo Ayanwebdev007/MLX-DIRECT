@@ -2,6 +2,7 @@ const User = require('../models/User');
 const Transaction = require('../models/Transaction');
 const Notification = require('../models/notificationModel');
 const { sendPushNotification } = require('../services/notificationService');
+const smsService = require('../services/smsService');
 
 // User operations
 exports.getBalance = async (req, res) => {
@@ -100,6 +101,23 @@ exports.deposit = async (req, res) => {
         user.fcmToken,
         'Money Received',
         `A deposit of ₹${amount} has been added to your wallet.`
+      );
+    }
+    
+    // Trigger SMS Notification
+    if (user.phone) {
+      const dateStr = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      const accountName = user.bankDetails?.accountHolderName || user.name;
+      await smsService.sendSMS(
+        user.phone, 
+        { 
+          v1: `${accountName}, your BOA Wallet`, 
+          v2: 'credited', 
+          v3: dateStr, 
+          v4: ', amount', 
+          v5: `${amount.toFixed(2)} by BOA PAY. ~`
+        },
+        '1207166115689631150'
       );
     }
 
@@ -203,6 +221,23 @@ exports.approveWithdrawal = async (req, res) => {
       );
     }
 
+    // Trigger SMS Notification for Withdrawal
+    if (status === 'approved' && user.phone) {
+      const dateStr = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      const accountName = user.bankDetails?.accountHolderName || user.name;
+      await smsService.sendSMS(
+        user.phone, 
+        { 
+          v1: `${accountName}, your BOA Wallet`, 
+          v2: 'debited', 
+          v3: dateStr, 
+          v4: ', amount', 
+          v5: `${transaction.amount.toFixed(2)} by BOA PAY. ~`
+        },
+        '1207166115689631150'
+      );
+    }
+
     res.json({ 
       message: `Transaction ${status}`, 
       transaction,
@@ -223,9 +258,10 @@ exports.updateVerificationStatus = async (req, res) => {
       if (user.kyc.status === status) return res.status(400).json({ message: `KYC status already set to ${status}` });
       user.kyc.status = status;
     } else if (type === 'bank') {
-      const verified = (status === 'approved');
-      if (user.bankDetails.verified === verified) return res.status(400).json({ message: `Bank verification already set to ${verified}` });
-      user.bankDetails.verified = verified;
+      const isApproved = (status === 'approved');
+      if (user.bankDetails.status === status) return res.status(400).json({ message: `Bank status already set to ${status}` });
+      user.bankDetails.status = status;
+      user.bankDetails.verified = isApproved;
     } else {
       return res.status(400).json({ message: 'Invalid verification type' });
     }
@@ -249,7 +285,6 @@ exports.updateVerificationStatus = async (req, res) => {
     });
     await notification.save();
 
-    // Send Push Notification
     if (user.fcmToken) {
       await sendPushNotification(user.fcmToken, title, message);
     }

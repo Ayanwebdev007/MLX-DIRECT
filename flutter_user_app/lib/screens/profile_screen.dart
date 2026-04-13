@@ -96,11 +96,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (user == null) return const Scaffold(body: Center(child: CircularProgressIndicator()));
 
     final kycStatus = user.kyc['status'] ?? 'none';
+    final bankStatus = user.bankDetails['status'] ?? 'none';
     final bankVerified = user.bankDetails['verified'] ?? false;
+    final hasBankDetails = user.bankDetails['accountNumber'] != null && user.bankDetails['accountNumber'].toString().isNotEmpty;
     
     // Logic to lock fields
     final bool kycLocked = kycStatus == 'approved' || kycStatus == 'pending';
-    final bool bankLocked = bankVerified;
+    final bool bankPending = bankStatus == 'pending';
+    final bool bankLocked = bankVerified || bankStatus == 'pending' || bankStatus == 'approved';
 
     return Scaffold(
       backgroundColor: const Color(0xFFF1F5F9), // Slate 100
@@ -146,6 +149,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Text(user.name, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: Colors.white, letterSpacing: -0.5)),
                   const SizedBox(height: 4),
                   Text(user.email.toLowerCase(), style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13, fontWeight: FontWeight.w600)),
+                  if (user.phone.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4.0),
+                      child: Text(user.phone, style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                    ),
                   const SizedBox(height: 30),
                   
                   // Verification Progress Stepper
@@ -153,7 +161,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       _buildStepIndicator('Identity', kycStatus == 'approved', kycStatus == 'pending'),
                       Expanded(child: Container(height: 2, color: Colors.white10)),
-                      _buildStepIndicator('Payout', bankVerified, false),
+                      _buildStepIndicator('Bank', bankVerified, bankPending),
                       Expanded(child: Container(height: 2, color: Colors.white10)),
                       _buildStepIndicator('Active', kycStatus == 'approved' && bankVerified, false),
                     ],
@@ -189,8 +197,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 32),
 
                   // BANK CARD
-                  _buildSectionLabel('PAYOUT DESTINATION', const FaIcon(FontAwesomeIcons.buildingColumns, size: 14, color: Colors.indigo)),
+                  _buildSectionLabel('SECURE BANK PORT', const FaIcon(FontAwesomeIcons.buildingColumns, size: 14, color: Colors.indigo)),
                   _buildPremiumCard(
+                    status: bankStatus,
                     isVerified: bankVerified,
                     locked: bankLocked,
                     child: Column(
@@ -204,9 +213,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         _buildStyledInput(_bankNameController, 'Financial Institution', bankLocked),
                         const SizedBox(height: 24),
                         if (!bankLocked)
-                          _buildSubmitButton('Secure Payout Route', _updateBank, isIndigo: true)
+                          _buildSubmitButton('Secure Bank Account', _updateBank, isIndigo: true)
                         else
-                          _buildLockedBadge('Verified Payout Channel', isSuccess: true),
+                          _buildLockedBadge(bankVerified ? 'Verified Bank Channel' : 'Awaiting Approval', isSuccess: bankVerified),
                       ],
                     ),
                   ),

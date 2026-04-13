@@ -14,6 +14,7 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
@@ -21,6 +22,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final success = await Provider.of<WalletProvider>(context, listen: false).register(
       _nameController.text,
       _emailController.text,
+      _phoneController.text,
       _passwordController.text,
     );
     if (success) {
@@ -92,6 +94,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   prefixIcon: Icon(Icons.email_outlined, size: 20),
                 ),
                 keyboardType: TextInputType.emailAddress,
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Mobile Number',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey.shade700),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _phoneController,
+                decoration: const InputDecoration(
+                  hintText: '9876543210',
+                  prefixIcon: Icon(Icons.phone_android_outlined, size: 20),
+                ),
+                keyboardType: TextInputType.phone,
               ),
               const SizedBox(height: 24),
               Text(

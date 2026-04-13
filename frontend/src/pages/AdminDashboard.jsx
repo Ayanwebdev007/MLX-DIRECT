@@ -53,7 +53,7 @@ const AdminDashboard = () => {
       if (activeTab === 'dashboard') {
         const res = await axios.get(`${API_BASE_URL}/wallet/admin/stats`, { headers });
         setStats(res.data);
-      } else if (activeTab === 'users') {
+      } else if (activeTab === 'users' || activeTab === 'kyc_requests') {
         const res = await axios.get(`${API_BASE_URL}/wallet/admin/users`, { headers });
         setUsers(res.data);
       } else if (activeTab === 'withdrawals') {
@@ -133,6 +133,25 @@ const AdminDashboard = () => {
       fetchData();
     } catch (err) {
       alert(err.response?.data?.error || err.response?.data?.message || 'Update failed');
+    }
+    setLoading(false);
+  };
+
+  const handleKycAction = async (userId, status, type = 'kyc') => {
+    const actionLabel = status === 'approved' ? 'approve' : 'reject';
+    const typeLabel = type === 'kyc' ? 'Identity Documents' : 'Bank Details';
+    
+    if (!window.confirm(`Are you sure you want to ${actionLabel} these ${typeLabel}?`)) return;
+    setLoading(true);
+    try {
+      await axios.post(`${API_BASE_URL}/wallet/admin/update-verification-status`, {
+        userId,
+        status,
+        type
+      }, { headers });
+      fetchData();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Update failed');
     }
     setLoading(false);
   };
@@ -286,27 +305,40 @@ const AdminDashboard = () => {
             <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden text-white/60 hover:text-white"><FaPlus className="rotate-45" size={20} /></button>
           </div>
 
-          <nav className="space-y-1.5">
+          <nav className="space-y-1">
             {[
               { id: 'dashboard', icon: <FaChartLine />, label: 'Dashboard' },
+              { id: 'users', icon: <FaUsers />, label: 'User List' },
+              { section: 'REQUESTS' },
+              { 
+                id: 'kyc_requests', 
+                icon: <FaUserShield />, 
+                label: `Verification Req ${users.filter(u => (u.kyc?.status === 'pending') || (u.bankDetails?.status === 'pending')).length > 0 ? '(' + users.filter(u => (u.kyc?.status === 'pending') || (u.bankDetails?.status === 'pending')).length + ')' : ''}` 
+              },
+              { id: 'withdrawals', icon: <FaHistory />, label: `Withdraw Requests ${stats?.pendingWithdrawals > 0 ? '(' + stats.pendingWithdrawals + ')' : ''}` },
+              { section: 'MANAGEMENT' },
               { id: 'enquiry', icon: <FaEnvelope />, label: `Enquiries ${messages.filter(m => m.status === 'unread').length > 0 ? '(' + messages.filter(m => m.status === 'unread').length + ')' : ''}` },
               { id: 'mail', icon: <FaPaperPlane />, label: 'Mail Hub' },
-              { id: 'users', icon: <FaUsers />, label: 'User List' },
-              { id: 'withdrawals', icon: <FaHistory />, label: 'Payout List' },
               { id: 'banners', icon: <FaImage />, label: 'Banners' }
-            ].map(item => (
-              <button
-                key={item.id}
-                onClick={() => { setActiveTab(item.id); setIsSidebarOpen(false); }}
-                className={`w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
-                  activeTab === item.id 
-                    ? 'bg-white text-[#003B91] shadow-xl' 
-                    : 'text-white/60 hover:text-white hover:bg-white/5'
-                }`}
-              >
-                <span className="text-base">{item.icon}</span>
-                <span>{item.label}</span>
-              </button>
+            ].map((item, idx) => (
+              item.section ? (
+                <div key={`sec-${idx}`} className="px-4 pt-6 pb-2">
+                  <p className="text-[10px] font-bold text-white/40 uppercase tracking-[0.2em]">{item.section}</p>
+                </div>
+              ) : (
+                <button
+                  key={item.id}
+                  onClick={() => { setActiveTab(item.id); setIsSidebarOpen(false); }}
+                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                    activeTab === item.id 
+                      ? 'bg-white text-[#003B91] shadow-xl ml-2 w-[calc(100%-8px)]' 
+                      : 'text-white/60 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <span className="text-base">{item.icon}</span>
+                  <span className="truncate">{item.label}</span>
+                </button>
+              )
             ))}
           </nav>
         </div>
@@ -512,6 +544,84 @@ const AdminDashboard = () => {
             </div>
           )}
 
+          {activeTab === 'kyc_requests' && (
+            <div className="space-y-6 animate-in fade-in duration-500">
+              <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                <div className="flex justify-between items-center mb-8">
+                  <div>
+                    <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest flex items-center">
+                      <FaUserShield className="mr-3 text-[#003B91]" /> Customer Verification Queue
+                    </h3>
+                    <p className="text-[10px] text-slate-400 font-bold mt-1 uppercase tracking-wider">Review pending Identity and Bank details</p>
+                  </div>
+                  <span className="bg-blue-50 text-[#003B91] px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border border-blue-100 italic">
+                    {users.filter(u => (u.kyc?.status === 'pending') || (u.bankDetails?.status === 'pending')).length} Active Requests
+                  </span>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="bg-slate-50/50 text-slate-400 text-[10px] font-bold uppercase tracking-widest border-b border-slate-100">
+                        <th className="px-8 py-5">User Profile</th>
+                        <th className="px-8 py-5 text-center">Identity Status</th>
+                        <th className="px-8 py-5 text-center">Bank Status</th>
+                        <th className="px-8 py-5 text-right">Review</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-50">
+                      {users.filter(u => (u.kyc?.status === 'pending') || (u.bankDetails?.status === 'pending')).length > 0 ? (
+                        users.filter(u => (u.kyc?.status === 'pending') || (u.bankDetails?.status === 'pending')).map((u) => (
+                          <tr key={u._id} className="hover:bg-slate-50/30 transition-colors">
+                            <td className="px-8 py-6">
+                              <div className="flex items-center space-x-4">
+                                <div style={{ backgroundColor: BRAND_BLUE }} className="w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold text-white uppercase shadow-md shrink-0">{u.name[0]}</div>
+                                <div className="overflow-hidden">
+                                  <p className="text-sm font-bold text-slate-900 truncate">{u.name}</p>
+                                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter truncate">{u.email}</p>
+                                </div>
+                              </div>
+                            </td>
+                            
+                            <td className="px-8 py-6 text-center">
+                              <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${u.kyc?.status === 'approved' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : (u.kyc?.status === 'pending' ? 'bg-orange-50 text-orange-600 border-orange-100' : 'bg-slate-50 text-slate-400 border-slate-200')}`}>
+                                {u.kyc?.status || 'NONE'}
+                              </span>
+                            </td>
+
+                            <td className="px-8 py-6 text-center">
+                              <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${u.bankDetails?.status === 'approved' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : (u.bankDetails?.status === 'pending' ? 'bg-orange-50 text-orange-600 border-orange-100' : 'bg-slate-50 text-slate-400 border-slate-200')}`}>
+                                {u.bankDetails?.status || 'NONE'}
+                              </span>
+                            </td>
+
+                            <td className="px-8 py-6 text-right">
+                               <button 
+                                 onClick={() => { setSelectedUser(u); setShowModal('verifyDocs'); }}
+                                 className="px-6 py-2 bg-[#003B91] text-white rounded-xl text-[10px] font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-lg shadow-blue-500/10 italic"
+                               >
+                                 Review Documents
+                               </button>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan="4" className="py-24 text-center">
+                             <div className="flex flex-col items-center justify-center space-y-3 opacity-20">
+                                <FaCheckCircle size={40} className="text-emerald-500" />
+                                <p className="italic font-bold text-slate-900 uppercase tracking-widest text-xs">All verifications completed</p>
+                             </div>
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
           {activeTab === 'users' && (
             <div className="space-y-6 animate-in fade-in duration-500">
               <div className="relative group">
@@ -533,6 +643,7 @@ const AdminDashboard = () => {
                       <tr className="bg-slate-50/50 text-slate-400 text-[10px] font-bold uppercase tracking-widest border-b border-slate-100">
                         <th className="px-8 py-5">User Info</th>
                         <th className="px-8 py-5 text-center">Status</th>
+                        <th className="px-8 py-5 text-center">Mobile</th>
                         <th className="px-8 py-5 text-center">Balance</th>
                         <th className="px-8 py-5 text-right">Actions</th>
                       </tr>
@@ -555,7 +666,12 @@ const AdminDashboard = () => {
                                <span className={`px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase border ${u.bankDetails?.verified ? 'bg-blue-50 text-[#003B91] border-blue-100' : 'bg-slate-50 text-slate-400 border-slate-200'}`}>BANK: {u.bankDetails?.verified ? 'Verified' : 'Pending'}</span>
                             </div>
                           </td>
-                          <td className="px-8 py-5 text-center"><span className="font-bold text-slate-900 text-sm tracking-tight">₹{u.walletBalance.toLocaleString()}</span></td>
+                          <td className="px-8 py-5 text-center">
+                            <span className="text-slate-600 text-sm font-medium">{u.phone || 'N/A'}</span>
+                          </td>
+                          <td className="px-8 py-5 text-center">
+                            <span className="font-bold text-slate-900 text-sm tracking-tight">₹{u.walletBalance.toLocaleString()}</span>
+                          </td>
                           <td className="px-8 py-5 text-right">
                             <div className="flex justify-end space-x-2">
                               <button onClick={() => { setSelectedUser(u); setShowModal('details'); }} title="View Details" className="p-3 bg-white text-slate-400 hover:text-[#003B91] rounded-xl border border-slate-100 hover:border-slate-300 transition-all shadow-sm"><FaSearch size={14} /></button>
@@ -596,6 +712,9 @@ const AdminDashboard = () => {
                         <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest border ${u.bankDetails?.verified ? 'bg-blue-50 text-blue-700 border-blue-100' : 'bg-slate-50 text-slate-400 border-slate-200'}`}>
                           BANK: {u.bankDetails?.verified ? 'Verified' : 'Pending'}
                         </span>
+                        {u.phone && (
+                          <span className="bg-blue-50 text-[#003B91] text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-widest border border-blue-100">{u.phone}</span>
+                        )}
                         <span className="bg-slate-50 text-slate-500 text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-widest border border-slate-100">Status: Active</span>
                       </div>
 
@@ -1003,67 +1122,142 @@ const AdminDashboard = () => {
       {isModalActive && (
         <div className="fixed inset-0 bg-[#003B91]/30 backdrop-blur-sm z-[100] flex items-center justify-center p-6 animate-in fade-in duration-300">
           <div className="bg-white w-full max-w-2xl rounded-[32px] shadow-[0_32px_128px_rgba(0,59,145,0.2)] overflow-hidden border border-slate-100 animate-in zoom-in-95 duration-400">
-             <div className="p-8">
-                <div className="flex justify-between items-center mb-10">
+             <div className="p-8 max-h-[90vh] flex flex-col">
+                <div className="flex justify-between items-center mb-10 shrink-0">
                    <div className="flex items-center space-x-3">
                       <div style={{ backgroundColor: BRAND_BLUE }} className="w-1.5 h-8 rounded-full"></div>
                       <h3 className="text-xl font-bold text-slate-900 tracking-tight">
-                        {showModal === 'deposit' ? 'Add Money' : showModal === 'limit' ? 'Update User Limit' : showModal === 'details' ? 'User Info' : 'Confirm Action'}
+                        {showModal === 'deposit' ? 'Add Money' : showModal === 'limit' ? 'Update User Limit' : showModal === 'details' ? 'User Info' : showModal === 'verifyDocs' ? 'Document Verification' : 'Confirm Action'}
                       </h3>
                    </div>
                    <button onClick={() => setShowModal(null)} className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-300 hover:text-[#CE2029] hover:bg-red-50 transition-all"><FaTimesCircle size={22} /></button>
                 </div>
 
-                {showModal === 'details' && (
+                <div className="overflow-y-auto custom-scrollbar flex-1 pr-2">
+                  {showModal === 'details' && (
+                    <div className="space-y-6">
+                       <div className="space-y-4">
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] px-1">Verification Documents</p>
+                          <div className="bg-slate-50 p-6 rounded-2xl flex justify-between border border-slate-100">
+                             <div>
+                                <p style={{ color: BRAND_BLUE }} className="text-[8px] font-bold uppercase mb-1.5 tracking-widest">PAN Card</p>
+                                <p className="text-base font-bold text-slate-900 uppercase tracking-widest">{selectedUser?.kyc?.pan || 'Not Provided'}</p>
+                             </div>
+                             <div className="text-right">
+                                <p style={{ color: BRAND_BLUE }} className="text-[8px] font-bold uppercase mb-1.5 tracking-widest">Aadhar Number</p>
+                                <p className="text-base font-bold text-slate-900 tracking-widest">{selectedUser?.kyc?.aadhar || 'Not Provided'}</p>
+                             </div>
+                          </div>
+                       </div>
+
+                       <div className="space-y-4 pt-10 border-t border-slate-100">
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] px-1">Bank Account Info</p>
+                          <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 gap-y-6 gap-x-4 grid grid-cols-2">
+                              <div>
+                                  <p style={{ color: BRAND_BLUE }} className="text-[8px] font-bold uppercase mb-1.5 tracking-widest">Account Holder</p>
+                                  <p className="text-sm font-bold text-slate-900 uppercase tracking-tight truncate">{selectedUser?.bankDetails?.accountHolderName || 'Not Provided'}</p>
+                              </div>
+                              <div className="text-right">
+                                  <p style={{ color: BRAND_BLUE }} className="text-[8px] font-bold uppercase mb-1.5 tracking-widest">Bank Name</p>
+                                  <p className="text-sm font-bold text-slate-900 tracking-tight truncate">{selectedUser?.bankDetails?.bankName || 'Not Added'}</p>
+                              </div>
+                              <div>
+                                  <p style={{ color: BRAND_BLUE }} className="text-[8px] font-bold uppercase mb-1.5 tracking-widest">Account Number</p>
+                                  <div className="flex items-center space-x-2">
+                                    <p className="text-sm font-bold text-slate-900 tracking-tight">{selectedUser?.bankDetails?.accountNumber || '--'}</p>
+                                    {selectedUser?.bankDetails?.accountNumber && <button onClick={() => copyToClipboard(selectedUser?.bankDetails?.accountNumber)} className="text-slate-400 hover:text-[#003B91]"><FaCopy size={12} /></button>}
+                                  </div>
+                              </div>
+                              <div className="text-right">
+                                  <p style={{ color: BRAND_BLUE }} className="text-[8px] font-bold uppercase mb-1.5 tracking-widest">IFSC Code</p>
+                                  <p className="text-sm font-bold text-slate-900 tracking-tight">{selectedUser?.bankDetails?.ifscCode || '--'}</p>
+                              </div>
+                          </div>
+                       </div>
+
+                       <div className="pt-6 mt-4">
+                          <button 
+                            onClick={() => handleDeleteUser(selectedUser)}
+                            className="w-full py-4 bg-white text-[#CE2029] border border-red-100 rounded-2xl text-[10px] font-bold uppercase tracking-widest hover:bg-red-50 transition-all duration-300 flex items-center justify-center space-x-2 shadow-sm hover:shadow-md"
+                          >
+                            <FaTrash />
+                            <span>Delete User Permanently</span>
+                          </button>
+                       </div>
+                    </div>
+                  )}
+
+                  {showModal === 'verifyDocs' && (
                   <div className="space-y-10">
-                     <div className="space-y-4">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] px-1">Verification Documents</p>
-                        <div className="bg-slate-50 p-6 rounded-2xl flex justify-between border border-slate-100">
-                           <div>
-                              <p style={{ color: BRAND_BLUE }} className="text-[8px] font-bold uppercase mb-1.5 tracking-widest">PAN Card</p>
-                              <p className="text-base font-bold text-slate-900 uppercase tracking-widest">{selectedUser?.kyc?.pan || 'Not Provided'}</p>
-                           </div>
-                           <div className="text-right">
-                              <p style={{ color: BRAND_BLUE }} className="text-[8px] font-bold uppercase mb-1.5 tracking-widest">Aadhar Number</p>
-                              <p className="text-base font-bold text-slate-900 tracking-widest">{selectedUser?.kyc?.aadhar || 'Not Provided'}</p>
-                           </div>
-                        </div>
-                     </div>
+                    <div className="flex items-center space-x-5 p-6 bg-slate-50/50 rounded-2xl border border-slate-100">
+                      <div style={{ backgroundColor: BRAND_BLUE }} className="w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-black text-white shadow-lg uppercase">{selectedUser?.name[0]}</div>
+                      <div>
+                        <p className="text-lg font-bold text-slate-900 tracking-tight">{selectedUser?.name}</p>
+                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{selectedUser?.email}</p>
+                      </div>
+                    </div>
 
-                     <div className="space-y-4 pt-10 border-t border-slate-100">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] px-1">Bank Account Info</p>
-                        <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 gap-y-6 gap-x-4 grid grid-cols-2">
-                            <div>
-                                <p style={{ color: BRAND_BLUE }} className="text-[8px] font-bold uppercase mb-1.5 tracking-widest">Account Holder</p>
-                                <p className="text-sm font-bold text-slate-900 uppercase tracking-tight truncate">{selectedUser?.bankDetails?.accountHolderName || 'Not Provided'}</p>
-                            </div>
-                            <div className="text-right">
-                                <p style={{ color: BRAND_BLUE }} className="text-[8px] font-bold uppercase mb-1.5 tracking-widest">Bank Name</p>
-                                <p className="text-sm font-bold text-slate-900 tracking-tight truncate">{selectedUser?.bankDetails?.bankName || 'Not Added'}</p>
-                            </div>
-                            <div>
-                                <p style={{ color: BRAND_BLUE }} className="text-[8px] font-bold uppercase mb-1.5 tracking-widest">Account Number</p>
-                                <div className="flex items-center space-x-2">
-                                  <p className="text-sm font-bold text-slate-900 tracking-tight">{selectedUser?.bankDetails?.accountNumber || '--'}</p>
-                                  {selectedUser?.bankDetails?.accountNumber && <button onClick={() => copyToClipboard(selectedUser?.bankDetails?.accountNumber)} className="text-slate-400 hover:text-[#003B91]"><FaCopy size={12} /></button>}
-                                </div>
-                            </div>
-                            <div className="text-right">
-                                <p style={{ color: BRAND_BLUE }} className="text-[8px] font-bold uppercase mb-1.5 tracking-widest">IFSC Code</p>
-                                <p className="text-sm font-bold text-slate-900 tracking-tight">{selectedUser?.bankDetails?.ifscCode || '--'}</p>
-                            </div>
+                    <div className="space-y-6">
+                      <div className="flex justify-between items-center">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] px-1">1. Identity Documents (KYC)</p>
+                        <span className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest border ${selectedUser?.kyc?.status === 'approved' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : (selectedUser?.kyc?.status === 'pending' ? 'bg-orange-50 text-orange-600 border-orange-100' : 'bg-slate-50 text-slate-400 border-slate-200')}`}>
+                          {selectedUser?.kyc?.status || 'NONE'}
+                        </span>
+                      </div>
+                      
+                      <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 grid grid-cols-2 gap-8">
+                        <div>
+                          <p style={{ color: BRAND_BLUE }} className="text-[8px] font-bold uppercase mb-1.5 tracking-widest">PAN Card Number</p>
+                          <p className="text-sm font-bold text-slate-900 uppercase tracking-widest italic">{selectedUser?.kyc?.pan || 'Not Provided'}</p>
                         </div>
-                     </div>
+                        <div className="text-right">
+                          <p style={{ color: BRAND_BLUE }} className="text-[8px] font-bold uppercase mb-1.5 tracking-widest">Aadhar Number</p>
+                          <p className="text-sm font-bold text-slate-900 tracking-widest italic">{selectedUser?.kyc?.aadhar || 'Not Provided'}</p>
+                        </div>
+                      </div>
 
-                     <div className="pt-6 mt-4">
-                        <button 
-                          onClick={() => handleDeleteUser(selectedUser)}
-                          className="w-full py-4 bg-white text-[#CE2029] border border-red-100 rounded-2xl text-[10px] font-bold uppercase tracking-widest hover:bg-red-50 transition-all duration-300 flex items-center justify-center space-x-2 shadow-sm hover:shadow-md"
-                        >
-                          <FaTrash />
-                          <span>Delete User Permanently</span>
-                        </button>
-                     </div>
+                      {selectedUser?.kyc?.status === 'pending' && (
+                        <div className="flex space-x-3">
+                          <button onClick={() => { handleKycAction(selectedUser._id, 'approved', 'kyc'); setShowModal(null); }} className="flex-1 py-4 bg-emerald-600 text-white rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-500/10">Approve Identity</button>
+                          <button onClick={() => { handleKycAction(selectedUser._id, 'rejected', 'kyc'); setShowModal(null); }} className="px-8 py-4 bg-white text-[#CE2029] border border-red-100 rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:bg-red-50 transition-all">Reject</button>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-6 pt-8 border-t border-slate-100">
+                      <div className="flex justify-between items-center">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] px-1">2. Financial Institution (BANK)</p>
+                        <span className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest border ${selectedUser?.bankDetails?.status === 'approved' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : (selectedUser?.bankDetails?.status === 'pending' ? 'bg-orange-50 text-orange-600 border-orange-100' : 'bg-slate-50 text-slate-400 border-slate-200')}`}>
+                          {selectedUser?.bankDetails?.status || 'NONE'}
+                        </span>
+                      </div>
+
+                      <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 grid grid-cols-2 gap-y-6 gap-x-4">
+                        <div>
+                          <p style={{ color: BRAND_BLUE }} className="text-[8px] font-bold uppercase mb-1.5 tracking-widest">Account Holder</p>
+                          <p className="text-sm font-bold text-slate-900 uppercase tracking-tight truncate">{selectedUser?.bankDetails?.accountHolderName || 'Not Provided'}</p>
+                        </div>
+                        <div className="text-right">
+                          <p style={{ color: BRAND_BLUE }} className="text-[8px] font-bold uppercase mb-1.5 tracking-widest">Financial Institution</p>
+                          <p className="text-sm font-bold text-slate-900 tracking-tight truncate">{selectedUser?.bankDetails?.bankName || 'Not Added'}</p>
+                        </div>
+                        <div>
+                          <p style={{ color: BRAND_BLUE }} className="text-[8px] font-bold uppercase mb-1.5 tracking-widest">Account Number</p>
+                          <p className="text-sm font-bold text-slate-900 tracking-tight font-mono">{selectedUser?.bankDetails?.accountNumber || '--'}</p>
+                        </div>
+                        <div className="text-right">
+                          <p style={{ color: BRAND_BLUE }} className="text-[8px] font-bold uppercase mb-1.5 tracking-widest">IFSC Routing Code</p>
+                          <p className="text-sm font-bold text-slate-900 tracking-tight font-mono">{selectedUser?.bankDetails?.ifscCode || '--'}</p>
+                        </div>
+                      </div>
+
+                      {selectedUser?.bankDetails?.status === 'pending' && (
+                        <div className="flex space-x-3">
+                          <button onClick={() => { handleKycAction(selectedUser._id, 'approved', 'bank'); setShowModal(null); }} style={{ backgroundColor: BRAND_BLUE }} className="flex-1 py-4 text-white rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:opacity-90 transition-all shadow-xl shadow-blue-500/10">Verify Bank Route</button>
+                          <button onClick={() => { handleKycAction(selectedUser._id, 'rejected', 'bank'); setShowModal(null); }} className="px-8 py-4 bg-white text-[#CE2029] border border-red-100 rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:bg-red-50 transition-all">Reject</button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
 
@@ -1132,7 +1326,7 @@ const AdminDashboard = () => {
                     {/* Integrated Action Header */}
                      <div className="flex items-center justify-between p-7 bg-slate-900 rounded-2xl shadow-xl overflow-hidden relative">
                         <div className="relative z-10">
-                          <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Approved Payout Amount</p>
+                          <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Approved Transfer Amount</p>
                           <p className="text-3xl font-bold text-white tracking-tight">₹{selectedWithdrawal?.amount.toLocaleString()}</p>
                         </div>
                         <div className="text-right relative z-10">
@@ -1160,7 +1354,7 @@ const AdminDashboard = () => {
                            ) : (
                              <>
                                {withdrawActionType === 'approved' ? <FaCheckCircle /> : <FaTimesCircle />}
-                               <span>{withdrawActionType === 'approved' ? 'Confirm & Process Payout' : 'Reject & Reverse Funds'}</span>
+                               <span>{withdrawActionType === 'approved' ? 'Confirm & Process Bank Transfer' : 'Reject & Reverse Funds'}</span>
                              </>
                            )}
                         </button>
@@ -1229,12 +1423,13 @@ const AdminDashboard = () => {
                   </div>
                 )}
 
+               </div>
              </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
+           </div>
+         </div>
+       )}
+     </div>
+   );
+ };
 
 export default AdminDashboard;

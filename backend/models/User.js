@@ -11,6 +11,18 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  phone: {
+    type: String,
+    trim: true,
+    unique: true,
+    required: true,
+    validate: {
+      validator: function(v) {
+        return /^[0-9]{10}$/.test(v);
+      },
+      message: props => `${props.value} is not a valid 10-digit phone number!`
+    }
+  },
   password: {
     type: String,
     required: true,
@@ -38,6 +50,7 @@ const userSchema = new mongoose.Schema({
     aadhar: { type: String, default: '' }
   },
   bankDetails: {
+    status: { type: String, enum: ['none', 'pending', 'approved', 'rejected'], default: 'none' },
     accountHolderName: { type: String, default: '' },
     accountNumber: { type: String, default: '' },
     ifscCode: { type: String, default: '' },

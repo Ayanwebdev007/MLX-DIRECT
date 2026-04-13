@@ -4,11 +4,12 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  // Production: point directly to the Render backend service
-  static const String baseUrl = String.fromEnvironment(
-    'API_URL',
-    defaultValue: 'https://mlx-direct-api.onrender.com/api', 
-  );
+  // Use this for production
+  static const String liveUrl = 'https://mlx-direct-api.onrender.com/api';
+  // Use this for local testing (so you can see your local SMS and logic changes)
+  static const String localUrl = 'http://localhost:5000/api';
+
+  static const String baseUrl = localUrl; 
   
   static Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
