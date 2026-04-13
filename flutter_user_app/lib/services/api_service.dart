@@ -9,7 +9,7 @@ class ApiService {
   // Use this for local testing (so you can see your local SMS and logic changes)
   static const String localUrl = 'http://localhost:5000/api';
 
-  static const String baseUrl = localUrl; 
+  static const String baseUrl = liveUrl; 
   
   static Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
