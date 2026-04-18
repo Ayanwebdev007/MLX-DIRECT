@@ -45,16 +45,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _pickDocument() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
-    );
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
+        withData: true, // Request bytes if possible
+      );
 
-    if (result != null) {
-      setState(() {
-        _selectedFileBytes = result.files.single.bytes;
-        _selectedFileName = result.files.single.name;
-      });
+      if (result != null && result.files.single != null) {
+        final file = result.files.single;
+        Uint8List? fileBytes = file.bytes;
+
+        // On mobile, bytes might be null, so we read from path
+        if (fileBytes == null && file.path != null) {
+          final localFile = File(file.path!);
+          fileBytes = await localFile.readAsBytes();
+        }
+
+        if (fileBytes != null) {
+          setState(() {
+            _selectedFileBytes = fileBytes;
+            _selectedFileName = file.name;
+          });
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Could not read file data. Please try again.')),
+          );
+        }
+      }
+    } catch (e) {
+      print('[FILE PICK ERROR]: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error picking file: $e')),
+      );
     }
   }
 

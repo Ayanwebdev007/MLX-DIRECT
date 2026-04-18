@@ -134,15 +134,25 @@ class WalletProvider with ChangeNotifier {
         contentType: MediaType.parse(mimeType),
       ));
       
+      if (bytes.isEmpty) return 'Selected file is empty';
+      if (bytes.length > 5 * 1024 * 1024) return 'File too large (Max 5MB)';
+
       var response = await request.send();
       var responseData = await response.stream.bytesToString();
-      final data = jsonDecode(responseData);
-
+      
+      print('[UPLOAD RESPONSE DATA]: $responseData');
+      
       if (response.statusCode == 200) {
+        final data = jsonDecode(responseData);
         return data['url']; // Return the Cloudinary URL
       } else {
         print('[UPLOAD ERROR] Status: ${response.statusCode}, Body: $responseData');
-        return 'Upload failed: ${data['message'] ?? 'Unknown error'}';
+        try {
+          final data = jsonDecode(responseData);
+          return 'Upload failed: ${data['message'] ?? 'Status ${response.statusCode}'}';
+        } catch (e) {
+          return 'Upload failed with status ${response.statusCode}';
+        }
       }
     } catch (e) {
       print('[UPLOAD EXCEPTION]: $e');
