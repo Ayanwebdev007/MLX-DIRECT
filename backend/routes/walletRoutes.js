@@ -13,6 +13,7 @@ router.get('/transactions', auth, walletController.getTransactions);
 // Admin routes
 router.get('/admin/users', auth, admin, walletController.getUsers);
 router.post('/admin/deposit', auth, admin, walletController.deposit);
+router.post('/admin/deduct', auth, admin, walletController.deduct);
 router.post('/admin/set-limit', auth, admin, walletController.setWithdrawLimit);
 router.get('/admin/withdrawals', auth, admin, walletController.getPendingWithdrawals);
 router.post('/admin/approve-withdrawal/:id', auth, admin, walletController.approveWithdrawal);

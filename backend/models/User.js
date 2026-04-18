@@ -47,7 +47,8 @@ const userSchema = new mongoose.Schema({
   kyc: {
     status: { type: String, enum: ['none', 'pending', 'approved', 'rejected'], default: 'none' },
     pan: { type: String, default: '' },
-    aadhar: { type: String, default: '' }
+    aadhar: { type: String, default: '' },
+    documentUrl: { type: String, default: '' }
   },
   bankDetails: {
     status: { type: String, enum: ['none', 'pending', 'approved', 'rejected'], default: 'none' },

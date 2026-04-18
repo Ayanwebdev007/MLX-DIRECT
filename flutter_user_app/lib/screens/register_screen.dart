@@ -19,20 +19,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _obscurePassword = true;
 
   void _register() async {
-    final success = await Provider.of<WalletProvider>(context, listen: false).register(
+    final error = await Provider.of<WalletProvider>(context, listen: false).register(
       _nameController.text,
       _emailController.text,
       _phoneController.text,
       _passwordController.text,
     );
-    if (success) {
+    if (error == null) {
       if (!mounted) return;
       Navigator.pushReplacementNamed(context, '/dashboard');
     } else {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Registration failed. Try a different email.'),
+        SnackBar(
+          content: Text(error),
           backgroundColor: AppTheme.errorRed,
           behavior: SnackBarBehavior.floating,
         ),

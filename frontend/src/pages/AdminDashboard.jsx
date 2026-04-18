@@ -24,6 +24,7 @@ const AdminDashboard = () => {
   const [selectedWithdrawal, setSelectedWithdrawal] = useState(null);
   const [withdrawActionType, setWithdrawActionType] = useState(null); 
   const [modalValue, setModalValue] = useState('');
+  const [walletSubAction, setWalletSubAction] = useState('deposit'); // 'deposit' or 'deduct'
   
   const [bannerTitle, setBannerTitle] = useState('');
   const [bannerLink, setBannerLink] = useState('');
@@ -79,7 +80,7 @@ const AdminDashboard = () => {
     if (!selectedUser || !modalValue) return;
     setLoading(true);
     try {
-      const endpoint = showModal === 'deposit' ? 'deposit' : 'set-limit';
+      const endpoint = showModal === 'deposit' ? walletSubAction : 'set-limit';
       const payload = showModal === 'deposit' 
         ? { userId: selectedUser._id, amount: Number(modalValue) }
         : { userId: selectedUser._id, limit: Number(modalValue) };
@@ -87,6 +88,7 @@ const AdminDashboard = () => {
       await axios.post(`${API_BASE_URL}/wallet/admin/${endpoint}`, payload, { headers });
       setShowModal(null);
       setModalValue('');
+      setWalletSubAction('deposit'); // Reset to default
       fetchData();
     } catch (err) {
       alert(err.response?.data?.message || 'Action failed');
@@ -426,20 +428,20 @@ const AdminDashboard = () => {
                        {stats.recentActivity?.length > 0 ? stats.recentActivity.map((a, i) => (
                          <div key={i} className="flex items-center justify-between p-5 rounded-2xl border border-slate-50 hover:border-slate-100 bg-slate-50/30 hover:bg-white hover:shadow-sm transition-all group">
                             <div className="flex items-center space-x-5">
-                               <div style={{ backgroundColor: a.type === 'deposit' ? '#10B98115' : '#003B9115', color: a.type === 'deposit' ? '#10B981' : BRAND_BLUE }} className="w-12 h-12 rounded-xl flex items-center justify-center text-base transition-transform group-hover:scale-110">
-                                  {a.type === 'deposit' ? <FaPlus /> : <FaHistory />}
+                               <div style={{ backgroundColor: a.type === 'deposit' ? '#10B98115' : (a.type === 'deduction' ? '#CE202915' : '#003B9115'), color: a.type === 'deposit' ? '#10B981' : (a.type === 'deduction' ? '#CE2029' : BRAND_BLUE) }} className="w-12 h-12 rounded-xl flex items-center justify-center text-base transition-transform group-hover:scale-110">
+                                  {a.type === 'deposit' ? <FaPlus /> : (a.type === 'deduction' ? <FaMinus /> : <FaHistory />)}
                                </div>
                                <div>
                                   <p className="text-[13px] font-bold text-slate-900 leading-none mb-1.5">{a.userId?.name || 'User'}</p>
-                                  <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center">
-                                     <span className={`w-1 h-1 rounded-full mr-1.5 ${a.type === 'deposit' ? 'bg-emerald-500' : 'bg-blue-500'}`}></span>
-                                     {a.type === 'deposit' ? 'Wallet Deposit' : 'Wallet Payout'}
+                                  <p className={`text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center ${a.type === 'deduction' ? 'text-red-400' : ''}`}>
+                                     <span className={`w-1 h-1 rounded-full mr-1.5 ${a.type === 'deposit' ? 'bg-emerald-500' : (a.type === 'deduction' ? 'bg-red-500' : 'bg-blue-500')}`}></span>
+                                     {a.type === 'deposit' ? 'Wallet Deposit' : (a.type === 'deduction' ? 'Manual Deduction' : 'Wallet Payout')}
                                   </p>
                                </div>
                             </div>
                             <div className="text-right">
-                               <p className={`text-sm font-bold ${a.type === 'deposit' ? 'text-emerald-600' : 'text-slate-900'}`}>
-                                  ₹{a.amount.toLocaleString()}
+                               <p className={`text-sm font-bold ${a.type === 'deposit' ? 'text-emerald-600' : (a.type === 'deduction' ? 'text-[#CE2029]' : 'text-slate-900')}`}>
+                                  {a.type === 'deposit' ? '+' : '-'}₹{a.amount.toLocaleString()}
                                </p>
                                <p className="text-[8px] font-bold text-slate-400 mt-1 uppercase opacity-60">{new Date(a.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                             </div>
@@ -1204,9 +1206,9 @@ const AdminDashboard = () => {
              <div className="p-8 max-h-[90vh] flex flex-col">
                 <div className="flex justify-between items-center mb-10 shrink-0">
                    <div className="flex items-center space-x-3">
-                      <div style={{ backgroundColor: BRAND_BLUE }} className="w-1.5 h-8 rounded-full"></div>
+                      <div style={{ backgroundColor: showModal === 'deposit' && walletSubAction === 'deduct' ? BRAND_RED : BRAND_BLUE }} className="w-1.5 h-8 rounded-full transition-colors"></div>
                       <h3 className="text-xl font-bold text-slate-900 tracking-tight">
-                        {showModal === 'deposit' ? 'Add Money' : showModal === 'limit' ? 'Update User Limit' : showModal === 'details' ? 'User Info' : showModal === 'verifyDocs' ? 'Document Verification' : 'Confirm Action'}
+                        {showModal === 'deposit' ? 'Adjust Wallet Balance' : showModal === 'limit' ? 'Update User Limit' : showModal === 'details' ? 'User Info' : showModal === 'verifyDocs' ? 'Document Verification' : 'Confirm Action'}
                       </h3>
                    </div>
                    <button onClick={() => setShowModal(null)} className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-300 hover:text-[#CE2029] hover:bg-red-50 transition-all"><FaTimesCircle size={22} /></button>
@@ -1254,6 +1256,50 @@ const AdminDashboard = () => {
                           </div>
                        </div>
 
+                       <div className="space-y-4 pt-10 border-t border-slate-100">
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] px-1">Physical Identity Document</p>
+                          {selectedUser?.kyc?.documentUrl ? (
+                            <div className="relative group rounded-2xl overflow-hidden border border-slate-200 bg-slate-50">
+                              {selectedUser?.kyc?.documentUrl.toLowerCase().endsWith('.pdf') ? (
+                                <div className="p-8 flex flex-col items-center justify-center space-y-4">
+                                  <FaUserShield size={32} className="text-slate-300" />
+                                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest text-center">PDF Identity Proof</p>
+                                  <a 
+                                    href={selectedUser.kyc.documentUrl} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="px-6 py-2.5 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#003B91] transition-all"
+                                  >
+                                    Open Document
+                                  </a>
+                                </div>
+                              ) : (
+                                <div className="relative">
+                                  <img 
+                                    src={selectedUser.kyc.documentUrl} 
+                                    alt="KYC Document" 
+                                    className="w-full h-auto max-h-[300px] object-contain mx-auto"
+                                  />
+                                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                     <a 
+                                      href={selectedUser.kyc.documentUrl} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="px-6 py-2.5 bg-white text-slate-900 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all font-mono"
+                                    >
+                                      Full Resolution
+                                    </a>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="p-10 border-2 border-dashed border-slate-100 rounded-3xl flex flex-col items-center justify-center text-slate-300 italic text-[10px] font-bold uppercase tracking-widest">
+                               No physical copy uploaded
+                            </div>
+                          )}
+                       </div>
+
                        <div className="pt-6 mt-4">
                           <button 
                             onClick={() => handleDeleteUser(selectedUser)}
@@ -1293,6 +1339,50 @@ const AdminDashboard = () => {
                           <p style={{ color: BRAND_BLUE }} className="text-[8px] font-bold uppercase mb-1.5 tracking-widest">Aadhar Number</p>
                           <p className="text-sm font-bold text-slate-900 tracking-widest italic">{selectedUser?.kyc?.aadhar || 'Not Provided'}</p>
                         </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <p style={{ color: BRAND_BLUE }} className="text-[8px] font-bold uppercase mb-1.5 tracking-widest">Physical Document Copy</p>
+                        {selectedUser?.kyc?.documentUrl ? (
+                          <div className="relative group rounded-2xl overflow-hidden border border-slate-200 bg-slate-50">
+                            {selectedUser?.kyc?.documentUrl.toLowerCase().endsWith('.pdf') ? (
+                              <div className="p-10 flex flex-col items-center justify-center space-y-4">
+                                <FaUserShield size={40} className="text-slate-300" />
+                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">PDF Document</p>
+                                <a 
+                                  href={selectedUser.kyc.documentUrl} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="px-6 py-2.5 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#003B91] transition-all"
+                                >
+                                  Open PDF in New Tab
+                                </a>
+                              </div>
+                            ) : (
+                              <div className="relative">
+                                <img 
+                                  src={selectedUser.kyc.documentUrl} 
+                                  alt="KYC Document" 
+                                  className="w-full h-auto max-h-[400px] object-contain mx-auto"
+                                />
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                   <a 
+                                    href={selectedUser.kyc.documentUrl} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="px-6 py-2.5 bg-white text-slate-900 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 transition-all"
+                                  >
+                                    View Full Resolution
+                                  </a>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="p-8 border-2 border-dashed border-slate-100 rounded-2xl flex flex-col items-center justify-center text-slate-300 italic text-[10px] font-bold uppercase tracking-widest">
+                             No Document Uploaded
+                          </div>
+                        )}
                       </div>
 
                       {selectedUser?.kyc?.status === 'pending' && (
@@ -1453,14 +1543,41 @@ const AdminDashboard = () => {
                         <p className="font-bold text-slate-900 text-sm tracking-tight">₹{selectedUser?.walletBalance?.toLocaleString()}</p>
                       </div>
                     </div>
+
+                    {showModal === 'deposit' && (
+                      <div className="space-y-3">
+                        <label style={{ color: BRAND_BLUE }} className="text-[8px] font-bold uppercase tracking-widest px-1">Select Operation Type</label>
+                        <div className="grid grid-cols-2 gap-3">
+                           <button 
+                             onClick={() => setWalletSubAction('deposit')}
+                             className={`py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border ${walletSubAction === 'deposit' ? 'bg-[#10B98110] border-emerald-500 text-emerald-600 shadow-sm' : 'bg-white border-slate-100 text-slate-400 opacity-60'}`}
+                           >
+                             Credit (+)
+                           </button>
+                           <button 
+                             onClick={() => setWalletSubAction('deduct')}
+                             className={`py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border ${walletSubAction === 'deduct' ? 'bg-[#CE202910] border-red-500 text-[#CE2029] shadow-sm' : 'bg-white border-slate-100 text-slate-400 opacity-60'}`}
+                           >
+                             Debit (-)
+                           </button>
+                        </div>
+                      </div>
+                    )}
+
                     <div className="space-y-2">
-                      <label style={{ color: BRAND_BLUE }} className="text-[8px] font-bold uppercase tracking-widest px-1">{showModal === 'deposit' ? 'Amount to Add' : 'New Limit'}</label>
+                      <label style={{ color: BRAND_BLUE }} className="text-[8px] font-bold uppercase tracking-widest px-1">
+                        {showModal === 'deposit' ? (walletSubAction === 'deposit' ? 'Amount to Credit' : 'Amount to Debit') : 'New Withdrawal Limit'}
+                      </label>
                       <input type="number" className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-900 outline-none focus:border-[#003B91] transition-all" value={modalValue} onChange={(e) => setModalValue(e.target.value)} placeholder="0.00" autoFocus />
                     </div>
                     <div className="flex space-x-4 pt-4">
                       <button onClick={() => setShowModal(null)} className="flex-1 py-4 bg-white text-slate-500 hover:text-slate-700 rounded-2xl font-bold text-[10px] uppercase tracking-widest border border-slate-200 transition-all">Cancel</button>
-                      <button onClick={handleActionSubmit} style={{ backgroundColor: BRAND_BLUE }} className="flex-[2] py-4 text-white rounded-2xl font-bold text-[10px] uppercase tracking-widest shadow-sm hover:opacity-90 transition-all">
-                        {loading ? 'Processing...' : (showModal === 'deposit' ? 'Add Money Now' : 'Update Limit')}
+                      <button 
+                        onClick={handleActionSubmit} 
+                        style={{ backgroundColor: showModal === 'deposit' && walletSubAction === 'deduct' ? BRAND_RED : BRAND_BLUE }} 
+                        className="flex-[2] py-4 text-white rounded-2xl font-bold text-[10px] uppercase tracking-widest shadow-sm hover:opacity-90 transition-all"
+                      >
+                        {loading ? 'Processing...' : (showModal === 'deposit' ? (walletSubAction === 'deposit' ? 'Apply Credit Now' : 'Apply Debit Now') : 'Update Limit')}
                       </button>
                     </div>
                   </div>

@@ -79,7 +79,7 @@ class HistoryScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                isDeposit ? 'Money Received' : 'Money Sent',
+                                tx.type == 'deposit' ? 'Money Received' : (tx.type == 'deduction' ? 'Wallet Deduction' : 'Money Sent'),
                                 style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: AppTheme.darkSlate),
                               ),
                               const SizedBox(height: 4),
@@ -150,7 +150,7 @@ class HistoryScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      isDeposit ? 'Money Received' : 'Withdrawal Request',
+                      tx.type == 'deposit' ? 'Money Received' : (tx.type == 'deduction' ? 'Wallet Deduction' : 'Withdrawal Request'),
                       style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.darkSlate),
                     ),
                     const SizedBox(height: 8),

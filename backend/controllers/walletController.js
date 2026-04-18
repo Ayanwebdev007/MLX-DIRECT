@@ -127,6 +127,75 @@ exports.deposit = async (req, res) => {
   }
 };
 
+exports.deduct = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const amount = Number(req.body.amount);
+    
+    if (!amount || amount <= 0) {
+      return res.status(400).json({ message: 'Amount must be greater than zero' });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    
+    if (user.walletBalance < amount) {
+      return res.status(400).json({ message: 'Insufficient user balance for this deduction' });
+    }
+
+    user.walletBalance = Number((user.walletBalance - amount).toFixed(2));
+    await user.save();
+
+    const transaction = new Transaction({
+      userId,
+      amount,
+      type: 'deduction',
+      status: 'approved',
+      description: 'Manually deducted by admin'
+    });
+    await transaction.save();
+
+    // Create Notification
+    const notification = new Notification({
+      userId,
+      title: 'Money Deducted',
+      message: `An amount of ₹${amount} has been deducted from your wallet by admin.`,
+      type: 'error'
+    });
+    await notification.save();
+
+    // Send Push Notification
+    if (user.fcmToken) {
+      await sendPushNotification(
+        user.fcmToken,
+        'Money Deducted',
+        `An amount of ₹${amount} has been deducted from your wallet.`
+      );
+    }
+    
+    // Trigger SMS Notification
+    if (user.phone) {
+      const dateStr = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      const accountName = user.bankDetails?.accountHolderName || user.name;
+      await smsService.sendSMS(
+        user.phone, 
+        { 
+          v1: `${accountName}, your BOA Wallet`, 
+          v2: 'debited', 
+          v3: dateStr, 
+          v4: ', amount', 
+          v5: `${amount.toFixed(2)} by BOA PAY. ~`
+        },
+        '1207166115689631150'
+      );
+    }
+
+    res.json({ message: 'Balance deducted', walletBalance: user.walletBalance });
+  } catch (error) {
+    res.status(500).json({ message: 'Deduction failed', error: error.message });
+  }
+};
+
 exports.setWithdrawLimit = async (req, res) => {
   try {
     const { userId } = req.body;

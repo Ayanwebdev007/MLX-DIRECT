@@ -5,6 +5,10 @@ import '../models/user_model.dart';
 import '../models/transaction_model.dart';
 import '../models/banner_model.dart';
 import '../services/api_service.dart';
+import 'package:http/http.dart' as http;
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:http_parser/http_parser.dart'; // Add this for MediaType
 
 class WalletProvider with ChangeNotifier {
   UserModel? _user;
@@ -45,7 +49,7 @@ class WalletProvider with ChangeNotifier {
     return false;
   }
 
-  Future<bool> register(String name, String email, String phone, String password) async {
+  Future<String?> register(String name, String email, String phone, String password) async {
     _isLoading = true;
     notifyListeners();
     try {
@@ -65,14 +69,18 @@ class WalletProvider with ChangeNotifier {
         await fetchData();
         _isLoading = false;
         notifyListeners();
-        return true;
+        return null; // Success
+      } else {
+        final data = jsonDecode(response.body);
+        _isLoading = false;
+        notifyListeners();
+        return data['message'] ?? 'Registration failed';
       }
     } catch (e) {
-      print('Register error: $e');
+      _isLoading = false;
+      notifyListeners();
+      return 'Connection error: $e';
     }
-    _isLoading = false;
-    notifyListeners();
-    return false;
   }
 
   Future<void> fetchData() async {
@@ -104,11 +112,50 @@ class WalletProvider with ChangeNotifier {
     }
   }
 
-  Future<String?> updateKYC(String pan, String aadhar) async {
+  Future<String?> uploadKycDocument(Uint8List bytes, String fileName) async {
+    try {
+      final token = await ApiService.getToken();
+      var request = http.MultipartRequest('POST', Uri.parse('${ApiService.baseUrl}/auth/upload-kyc-doc'));
+      
+      request.headers.addAll({
+        'Authorization': 'Bearer $token',
+      });
+      
+      // Determine MIME type
+      String mimeType = 'application/octet-stream';
+      if (fileName.toLowerCase().endsWith('.pdf')) mimeType = 'application/pdf';
+      else if (fileName.toLowerCase().endsWith('.png')) mimeType = 'image/png';
+      else if (fileName.toLowerCase().endsWith('.jpg') || fileName.toLowerCase().endsWith('.jpeg')) mimeType = 'image/jpeg';
+
+      request.files.add(http.MultipartFile.fromBytes(
+        'document', 
+        bytes,
+        filename: fileName,
+        contentType: MediaType.parse(mimeType),
+      ));
+      
+      var response = await request.send();
+      var responseData = await response.stream.bytesToString();
+      final data = jsonDecode(responseData);
+
+      if (response.statusCode == 200) {
+        return data['url']; // Return the Cloudinary URL
+      } else {
+        print('[UPLOAD ERROR] Status: ${response.statusCode}, Body: $responseData');
+        return 'Upload failed: ${data['message'] ?? 'Unknown error'}';
+      }
+    } catch (e) {
+      print('[UPLOAD EXCEPTION]: $e');
+      return 'Connection error during upload: $e';
+    }
+  }
+
+  Future<String?> updateKYC(String pan, String aadhar, String documentUrl) async {
     try {
       final response = await ApiService.post('/auth/update-kyc', {
         'pan': pan,
         'aadhar': aadhar,
+        'documentUrl': documentUrl,
       });
 
       if (response.statusCode == 200) {

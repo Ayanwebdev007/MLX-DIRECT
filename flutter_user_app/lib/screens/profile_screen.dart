@@ -3,6 +3,9 @@ import 'package:provider/provider.dart';
 import '../providers/wallet_provider.dart';
 import '../utils/app_theme.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:file_picker/file_picker.dart';
+import 'dart:io';
+import 'dart:typed_data';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -21,6 +24,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _bankNameController = TextEditingController();
 
   bool _isLoading = false;
+  bool _isUploadingToCloudinary = false;
+  Uint8List? _selectedFileBytes;
+  String? _selectedFileName;
+  String? _documentUrl;
 
   @override
   void initState() {
@@ -33,6 +40,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _accNumberController.text = user.bankDetails['accountNumber'] ?? '';
       _ifscController.text = user.bankDetails['ifscCode'] ?? '';
       _bankNameController.text = user.bankDetails['bankName'] ?? '';
+      _documentUrl = user.kyc['documentUrl'];
+    }
+  }
+
+  Future<void> _pickDocument() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
+    );
+
+    if (result != null) {
+      setState(() {
+        _selectedFileBytes = result.files.single.bytes;
+        _selectedFileName = result.files.single.name;
+      });
     }
   }
 
@@ -44,11 +66,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return;
     }
 
+    if (_selectedFileBytes == null && _documentUrl == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please upload a physical document copy')),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
+    
+    String? finalDocUrl = _documentUrl;
+
+    // 1. Upload if a new file is selected
+    if (_selectedFileBytes != null && _selectedFileName != null) {
+      setState(() => _isUploadingToCloudinary = true);
+      final uploadResult = await Provider.of<WalletProvider>(context, listen: false).uploadKycDocument(_selectedFileBytes!, _selectedFileName!);
+      setState(() => _isUploadingToCloudinary = false);
+      
+      if (uploadResult != null && (uploadResult.startsWith('http') || uploadResult.startsWith('https'))) {
+        finalDocUrl = uploadResult;
+      } else {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(uploadResult ?? 'Upload failed'), backgroundColor: AppTheme.errorRed),
+        );
+        return;
+      }
+    }
+
+    // 2. Submit KYC with URL
     final error = await Provider.of<WalletProvider>(context, listen: false).updateKYC(
       _panController.text,
       _aadharController.text,
+      finalDocUrl!,
     );
+    
     setState(() => _isLoading = false);
 
     if (error == null) {
@@ -186,6 +238,76 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         const SizedBox(height: 20),
                         _buildStyledInput(_aadharController, 'Aadhar Number', kycLocked, isNumeric: true),
                         const SizedBox(height: 24),
+                        
+                        // DOCUMENT UPLOAD SECTION
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('DOCUMENT COPY (IMAGE/PDF)', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: Colors.grey.shade400, letterSpacing: 1)),
+                            const SizedBox(height: 12),
+                            GestureDetector(
+                              onTap: kycLocked ? null : _pickDocument,
+                              child: Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                                decoration: BoxDecoration(
+                                  color: kycLocked ? Colors.grey.shade50 : Colors.blue.withOpacity(0.03),
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: _selectedFileBytes != null || (_documentUrl != null && _documentUrl!.isNotEmpty) ? AppTheme.successEmerald.withOpacity(0.3) : Colors.blue.withOpacity(0.1),
+                                    style: BorderStyle.solid,
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        color: (_selectedFileBytes != null || (_documentUrl != null && _documentUrl!.isNotEmpty)) ? AppTheme.successEmerald.withOpacity(0.1) : AppTheme.primaryBlue.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: _isUploadingToCloudinary 
+                                        ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primaryBlue))
+                                        : Icon(
+                                            (_selectedFileBytes != null || (_documentUrl != null && _documentUrl!.isNotEmpty)) ? Icons.check_circle_outline : Icons.cloud_upload_outlined,
+                                            color: (_selectedFileBytes != null || (_documentUrl != null && _documentUrl!.isNotEmpty)) ? AppTheme.successEmerald : AppTheme.primaryBlue,
+                                            size: 20,
+                                          ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            _isUploadingToCloudinary 
+                                              ? 'Uploading to secure server...'
+                                              : (_selectedFileBytes != null 
+                                                ? 'File: $_selectedFileName' 
+                                                : ((_documentUrl != null && _documentUrl!.isNotEmpty) ? 'Document Uploaded' : 'Tap to select document')),
+                                            style: TextStyle(
+                                              fontSize: 13, 
+                                              fontWeight: FontWeight.bold, 
+                                              color: _isUploadingToCloudinary ? AppTheme.primaryBlue : ((_selectedFileBytes != null || (_documentUrl != null && _documentUrl!.isNotEmpty)) ? AppTheme.successEmerald : Colors.black87)
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          if (!_isUploadingToCloudinary && _selectedFileBytes == null && (_documentUrl == null || _documentUrl!.isEmpty))
+                                            Text('PNG, JPG or PDF (Max 5MB)', style: TextStyle(fontSize: 10, color: Colors.grey.shade500, fontWeight: FontWeight.w600)),
+                                          if (_isUploadingToCloudinary)
+                                            Text('Please wait while we process your file', style: TextStyle(fontSize: 10, color: AppTheme.primaryBlue.withOpacity(0.6), fontWeight: FontWeight.w600)),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        
+                        const SizedBox(height: 32),
                         if (!kycLocked)
                           _buildSubmitButton('Submit KYC Documents', _updateKYC)
                         else
