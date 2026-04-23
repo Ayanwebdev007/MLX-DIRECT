@@ -22,7 +22,7 @@ const ContactPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const apiUrl = import.meta.env.VITE_API_BASE_URL || (import.meta.env.PROD ? 'https://mlx-direct-api.onrender.com/api' : 'http://localhost:5000/api');
+    const apiUrl = import.meta.env.VITE_API_BASE_URL || 'https://mlxdirect.com/api';
     
     try {
       const response = await fetch(`${apiUrl.replace('/api', '')}/api/contact/submit`, {

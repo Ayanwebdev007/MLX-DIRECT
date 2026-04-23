@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
   // Use this for production
-  static const String liveUrl = 'https://mlx-direct-api.onrender.com/api';
+  static const String liveUrl = 'https://mlxdirect.com/api';
   // Use this for local testing (so you can see your local SMS and logic changes)
   static const String localUrl = 'http://localhost:5000/api';
 
