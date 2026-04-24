@@ -20,8 +20,8 @@ const MapSection = () => {
     };
   }, []);
 
-  // Coordinates for Fort Lauderdale, Florida with red pin
-  const mapSrc = "https://maps.google.com/maps?q=26.1420358,-80.1373&hl=en&z=15&output=embed";
+  // Coordinates for 7200 West Commercial Blvd, Suite 206, Ft Lauderdale, FL 33319
+  const mapSrc = "https://maps.google.com/maps?q=26.2014,-80.2465&hl=en&z=15&output=embed";
 
   return (
     <section ref={sectionRef} className="relative w-full min-h-[650px] bg-gray-50 overflow-hidden group">
@@ -58,8 +58,8 @@ const MapSection = () => {
                 <span className="w-4 h-[1px] bg-primary-green"></span> Physical Office
               </p>
               <p className="text-lg font-bold text-gray-800 leading-tight">
-                Fort Lauderdale,<br />
-                Florida, United States
+                7200 West Commercial Blvd,<br />
+                Suite 206, Ft Lauderdale, FL 33319
               </p>
             </div>
             
@@ -74,7 +74,7 @@ const MapSection = () => {
 
             <div className="pt-6 border-t border-gray-100">
               <a 
-                href="https://maps.google.com/?q=26.1420358,-80.1373" 
+                href="https://maps.google.com/?q=26.2014,-80.2465" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="group/btn relative inline-flex items-center gap-6 text-[10px] font-black text-gray-900 uppercase tracking-[0.4em] hover:text-primary-green transition-colors duration-500"

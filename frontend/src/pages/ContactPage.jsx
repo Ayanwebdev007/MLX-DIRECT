@@ -97,7 +97,7 @@ const ContactPage = () => {
                       </div>
                       <div>
                          <h6 className="font-black text-xs uppercase tracking-widest text-gray-900 mb-2">Corporate HQ (USA)</h6>
-                         <p className="text-sm font-medium text-gray-500">Fort Lauderdale, Florida,<br/> United States</p>
+                         <p className="text-sm font-medium text-gray-500">7200 West Commercial Blvd,<br/> Suite 206, Ft Lauderdale, FL 33319</p>
                       </div>
                    </div>
 

@@ -101,7 +101,7 @@ const Footer = () => {
                 <FaMapMarkerAlt className="text-primary-green mt-1 text-lg" />
                 <div>
                    <p className="text-[10px] font-black text-primary-green uppercase tracking-widest mb-1">Corporate HQ (USA)</p>
-                   <p className="text-sm font-light text-gray-400 leading-tight">Fort Lauderdale, Florida,<br />United States</p>
+                   <p className="text-sm font-light text-gray-400 leading-tight">7200 West Commercial Blvd,<br />Suite 206, Ft Lauderdale, FL 33319</p>
                 </div>
               </li>
               <li className="flex items-start gap-4">
