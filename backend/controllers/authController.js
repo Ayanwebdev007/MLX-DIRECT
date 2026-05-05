@@ -209,38 +209,52 @@ exports.updateKYC = async (req, res) => {
   }
 };
 
-// Update Bank Details (with Mock Penny Drop)
+// Update Bank Details (Format Verification Only)
 exports.updateBankDetails = async (req, res) => {
   try {
-    const { accountHolderName, accountNumber, ifscCode, bankName } = req.body;
+    let { accountHolderName, accountNumber, ifscCode, bankName } = req.body;
+
+    // 1. Sanitize Inputs
+    accountHolderName = accountHolderName?.trim();
+    accountNumber = accountNumber?.trim();
+    ifscCode = ifscCode?.trim()?.toUpperCase();
+    bankName = bankName?.trim();
 
     if (!accountNumber || !ifscCode) {
       return res.status(400).json({ message: 'Account number and IFSC are required' });
     }
 
-    // Trigger Mock Verification (Penny Drop)
-    const verification = await razorpayService.verifyBankAccount({
-      accountHolderName,
-      accountNumber,
-      ifscCode
-    });
+    // 2. Format Validation (Regex)
+    const ifscRegex = /^[A-Z]{4}0[A-Z0-9]{6}$/;
+    const accountRegex = /^[0-9]{9,18}$/;
 
+    if (!ifscRegex.test(ifscCode)) {
+      return res.status(400).json({ message: 'Invalid IFSC code format' });
+    }
+
+    if (!accountRegex.test(accountNumber)) {
+      return res.status(400).json({ message: 'Invalid Account Number format' });
+    }
+
+    // 3. Bypass external Razorpay verification (Format Check only as requested)
+    // We keep the structure consistent with what the app expects
     await User.findByIdAndUpdate(req.user.id, {
       bankDetails: {
-        status: 'pending',
-        accountHolderName: verification.registeredName,
+        status: 'pending', // Keeps it pending for admin final check if desired
+        accountHolderName,
         accountNumber,
         ifscCode,
         bankName,
-        verified: false
+        verified: false // Set to false since it's just format-checked, not penny-dropped
       }
     });
  
     res.json({ 
-      message: 'Bank account details submitted for manual verification', 
-      verifiedName: verification.registeredName 
+      message: 'Bank details submitted for verification', 
+      verifiedName: accountHolderName 
     });
   } catch (error) {
-    res.status(500).json({ message: 'Bank verification failed', error: error.message });
+    console.error('[BANK UPDATE ERROR]', error);
+    res.status(500).json({ message: 'Bank details update failed', error: error.message });
   }
 };
