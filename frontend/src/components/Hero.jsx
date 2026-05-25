@@ -41,7 +41,7 @@ const Hero = () => {
           <div className="flex items-center gap-3">
             <span className={`h-[2px] bg-primary-green transition-all duration-1000 delay-300 ${isVisible ? 'w-12' : 'w-0'}`}></span>
             <span className="text-primary-green text-xs font-bold tracking-[0.4rem] uppercase">
-              Elite Industrial Solutions
+              rare antiques coin purchaser and seller
             </span>
           </div>
 

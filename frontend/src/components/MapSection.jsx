@@ -20,8 +20,8 @@ const MapSection = () => {
     };
   }, []);
 
-  // Coordinates for 7200 West Commercial Blvd, Suite 206, Ft Lauderdale, FL 33319
-  const mapSrc = "https://maps.google.com/maps?q=26.2014,-80.2465&hl=en&z=15&output=embed";
+  // Coordinates for 7200 West Commercial Blvd, Suite 206, Fort Lauderdale, Florida 33319, USA
+  const mapSrc = "https://maps.google.com/maps?q=26.2012296629797,-80.24834505982416&hl=en&z=15&output=embed";
 
   return (
     <section ref={sectionRef} className="relative w-full min-h-[650px] bg-gray-50 overflow-hidden group">
@@ -59,7 +59,7 @@ const MapSection = () => {
               </p>
               <p className="text-lg font-bold text-gray-800 leading-tight">
                 7200 West Commercial Blvd,<br />
-                Suite 206, Ft Lauderdale, FL 33319
+                Suite 206, Fort Lauderdale, Florida 33319, USA
               </p>
             </div>
             
@@ -74,7 +74,7 @@ const MapSection = () => {
 
             <div className="pt-6 border-t border-gray-100">
               <a 
-                href="https://maps.google.com/?q=26.2014,-80.2465" 
+                href="https://maps.google.com/?q=26.2012296629797,-80.24834505982416" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="group/btn relative inline-flex items-center gap-6 text-[10px] font-black text-gray-900 uppercase tracking-[0.4em] hover:text-primary-green transition-colors duration-500"
